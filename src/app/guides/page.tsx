@@ -7,7 +7,10 @@ import { plainText } from "@/components/layout/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WEBSITE_ID, absoluteUrl, breadcrumbList, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = pageMetadata({ title: PAGE_SEO.guides.title, description: PAGE_SEO.guides.description, path: "/guides", siteImage: true });
+export const metadata: Metadata = {
+  ...pageMetadata({ title: PAGE_SEO.guides.title, description: PAGE_SEO.guides.description, path: "/guides", siteImage: true }),
+  keywords: GUIDES.flatMap((g) => g.keywords.slice(0, 1)),
+};
 
 export default function GuidesPage() {
   const url = absoluteUrl("/guides");

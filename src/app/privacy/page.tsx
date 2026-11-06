@@ -35,7 +35,11 @@ export default function PrivacyPage() {
         <a href={SITE.organizationUrl} className="font-medium text-fg underline">
           {SITE.organization}
         </a>
-        . Questions about privacy can be sent through the Devcipator website. See also{" "}
+        . Questions about privacy can be sent to{" "}
+        <a href={`mailto:${SITE.email}`} className="font-medium text-fg underline">
+          {SITE.email}
+        </a>
+        . See also{" "}
         <Link href="/about" className="font-medium text-fg underline">
           About {SITE.name}
         </Link>

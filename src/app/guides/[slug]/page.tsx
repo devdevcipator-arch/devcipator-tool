@@ -17,9 +17,11 @@ export async function generateMetadata({ params }: PageProps<"/guides/[slug]">):
   const { slug } = await params;
   const guide = getGuide(slug);
   if (!guide) return { title: "Guide not found" };
-  const meta = pageMetadata({ title: guide.title, description: guide.description, path: `/guides/${guide.slug}`, siteImage: true });
+  // No siteImage: this segment has its own opengraph-image.
+  const meta = pageMetadata({ title: guide.title, description: guide.description, path: `/guides/${guide.slug}` });
   return {
     ...meta,
+    keywords: guide.keywords,
     openGraph: { ...meta.openGraph, type: "article", publishedTime: guide.published, modifiedTime: guide.updated },
   };
 }
@@ -46,10 +48,10 @@ export default async function GuidePage({ params }: PageProps<"/guides/[slug]">)
       datePublished: guide.published,
       dateModified: guide.updated,
       inLanguage: "en",
-      author: { "@id": ORGANIZATION_ID },
+      author: { "@type": "Organization", "@id": ORGANIZATION_ID, name: SITE.organization, url: SITE.organizationUrl },
       publisher: { "@id": ORGANIZATION_ID },
       isPartOf: { "@id": WEBSITE_ID },
-      image: absoluteUrl("/opengraph-image"),
+      image: absoluteUrl(`/guides/${guide.slug}/opengraph-image/card`),
       mentions: tools.map((t) => ({ "@type": "WebApplication", name: t.title, url: absoluteUrl(`/tools/${t.slug}`) })),
     },
     breadcrumbList([

@@ -47,10 +47,17 @@ export function Footer() {
               <Link href="/#all-tools" className="hover:text-fg max-sm:py-3 pointer-coarse:py-3">All tools</Link>
             </nav>
           </div>
+          <nav aria-label="Devcipator on social media" className="flex flex-wrap justify-center gap-x-5">
+            {SITE.profiles.map((p) => (
+              <a key={p.url} href={p.url} target="_blank" rel="me noopener" className="hover:text-fg max-sm:py-3 pointer-coarse:py-3">
+                {p.name}
+              </a>
+            ))}
+          </nav>
           <p className="text-center">
             Powered by{" "}
             <a
-              href="https://devcipator.com/"
+              href={SITE.organizationUrl}
               target="_blank"
               rel="noopener"
               className="font-medium text-fg-muted hover:text-fg pointer-coarse:inline-block pointer-coarse:py-3"

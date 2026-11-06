@@ -67,6 +67,9 @@ const SITE_GRAPH = [
     url: SITE.organizationUrl,
     description: `${SITE.organization} makes ${SITE.name}, free in-browser tools for PDFs, images, audio and everyday tasks.`,
     logo: { "@type": "ImageObject", url: absoluteUrl(SITE.logo), width: 924, height: 192 },
+    email: SITE.email,
+    contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: SITE.email, availableLanguage: ["English"] },
+    sameAs: SITE.profiles.map((p) => p.url),
   },
   {
     "@type": "WebSite",

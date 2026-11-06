@@ -1140,6 +1140,15 @@ export const SITE = {
   /** Publisher name used in structured data. */
   organization: "Devcipator",
   organizationUrl: "https://www.devcipator.com/",
+  /** Public contact address, as published in the company site's own structured data. */
+  email: "admin@devcipator.com",
+  /** Official company profiles, the same list devcipator.com publishes as its sameAs. Used for Organization.sameAs and the footer. */
+  profiles: [
+    { name: "LinkedIn", url: "https://www.linkedin.com/company/devcipator/" },
+    { name: "YouTube", url: "https://www.youtube.com/@devcipator" },
+    { name: "Instagram", url: "https://www.instagram.com/devcipator/" },
+    { name: "Facebook", url: "https://www.facebook.com/profile.php?id=61583276521391" },
+  ],
   logo: "/devcipator-logo.png",
   description: "Free, private, in-browser tools for PDFs, images, audio and everyday tasks. Files never leave your device.",
   /** Meta keywords for pages without their own (home, privacy, terms). */

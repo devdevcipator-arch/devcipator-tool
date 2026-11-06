@@ -91,10 +91,26 @@ export default function AboutPage() {
 
       <h2>Contact</h2>
       <p>
-        {SITE.name} is a {SITE.organization} project. To get in touch, report a problem or suggest a tool, visit{" "}
+        {SITE.name} is a {SITE.organization} project. To report a problem or suggest a tool, email{" "}
+        <a href={`mailto:${SITE.email}`} className="font-medium text-fg underline">
+          {SITE.email}
+        </a>{" "}
+        or visit{" "}
         <a href={SITE.organizationUrl} className="font-medium text-fg underline">
           devcipator.com
         </a>
+        .
+      </p>
+      <p>
+        Follow {SITE.organization} on{" "}
+        {SITE.profiles.map((p, i) => (
+          <span key={p.url}>
+            {i > 0 && (i === SITE.profiles.length - 1 ? " and " : ", ")}
+            <a href={p.url} rel="me noopener" target="_blank" className="font-medium text-fg underline">
+              {p.name}
+            </a>
+          </span>
+        ))}
         .
       </p>
     </ProsePage>

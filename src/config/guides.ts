@@ -22,6 +22,8 @@ export interface GuideConfig {
   /** ISO dates. */
   published: string;
   updated: string;
+  /** Search phrases this guide answers; used for the keywords meta tag. */
+  keywords: string[];
   /** Tools this guide uses; it is listed on their pages too. The first one gets the call to action. */
   tools: string[];
   sections: GuideSection[];
@@ -30,6 +32,7 @@ export interface GuideConfig {
 export const GUIDES: GuideConfig[] = [
   {
     slug: "how-to-compress-a-pdf",
+    keywords: ["how to compress a pdf","reduce pdf file size","make pdf smaller for email","compress scanned pdf","pdf too large to email"],
     title: "How to Compress a PDF and Reduce Its Size",
     description: "Make a PDF smaller for email or an upload limit: when compression works, which level to choose, and what to do when a PDF won't shrink. Free, no upload.",
     answer: "To compress a PDF, open it in [Compress PDF](/tools/compress-pdf), pick Balanced compression and download the smaller file. Scanned and image-heavy PDFs shrink the most. Text-only PDFs are already small and may not get smaller.",
@@ -72,6 +75,7 @@ export const GUIDES: GuideConfig[] = [
   },
   {
     slug: "how-to-merge-pdf-files",
+    keywords: ["how to merge pdf files","combine pdf files into one","merge pdf without uploading","join pdf documents"],
     title: "How to Merge PDF Files Without Uploading",
     description: "Combine several PDFs into one file in the order you want, for free and without uploading them. Step-by-step guide, plus tips for scans and large files.",
     answer: "To merge PDFs, add them to [Merge PDF](/tools/merge-pdf), drag them into the order you want and press Merge. The combined file downloads straight away. The pages are copied exactly, so nothing loses quality.",
@@ -112,6 +116,7 @@ export const GUIDES: GuideConfig[] = [
   },
   {
     slug: "how-to-reduce-image-size",
+    keywords: ["how to reduce image size","reduce image file size without losing quality","make photo smaller","shrink image for email"],
     title: "Reduce Image Size Without Losing Quality",
     description: "Shrink photos for email, websites and upload forms: compress, resize or switch format. Which method saves the most, and how to keep images looking sharp.",
     answer: "The quickest way to reduce an image's file size is to compress it in [Compress Image](/tools/compress-image) at about 80% quality. If it is still too big, lower its pixel dimensions with [Resize Image](/tools/resize-image), or convert it to WebP.",
@@ -152,6 +157,7 @@ export const GUIDES: GuideConfig[] = [
   },
   {
     slug: "png-vs-jpg-vs-webp",
+    keywords: ["png vs jpg","jpg vs webp","png vs webp","best image format for web","which image format to use"],
     title: "PNG vs JPG vs WebP: Which Image Format to Use",
     description: "PNG, JPG or WebP? A plain comparison of quality, file size, transparency and support, with which format to pick for photos, logos, screenshots and websites.",
     answer: "Use JPG for photos you want to share, PNG for screenshots, logos and anything transparent, and WebP for the smallest files on websites. WebP works in all current browsers, but some older apps still expect JPG or PNG.",
@@ -189,6 +195,7 @@ export const GUIDES: GuideConfig[] = [
   },
   {
     slug: "are-online-pdf-tools-safe",
+    keywords: ["are online pdf tools safe","is it safe to upload pdf online","private pdf tools","pdf tools without upload"],
     title: "Are Online PDF Tools Safe? What to Check",
     description: "What happens to your files on an online PDF or image tool, the questions to ask before uploading a document, and how browser-based tools avoid uploads.",
     answer: "Online PDF tools that upload your file put a copy on someone else's server, where it is stored at least briefly. Tools that run in your browser, like Devcipator Tools, process the file on your own device, so it is never sent anywhere.",
@@ -229,6 +236,7 @@ export const GUIDES: GuideConfig[] = [
   },
   {
     slug: "how-to-sign-a-pdf",
+    keywords: ["how to sign a pdf","sign pdf without printing","add signature to pdf online","electronic signature pdf"],
     title: "How to Sign a PDF Online Without Printing It",
     description: "Add your signature to a PDF without printing or scanning: draw it or upload an image, place it on any page and download. Free and without uploading the PDF.",
     answer: "To sign a PDF without printing it, open it in [Sign PDF](/tools/sign-pdf), draw your signature or upload a picture of it, drag it to the right spot and download the signed copy. The document stays on your device the whole time.",
@@ -270,6 +278,7 @@ export const GUIDES: GuideConfig[] = [
   },
   {
     slug: "do-qr-codes-expire",
+    keywords: ["do qr codes expire","static vs dynamic qr code","qr code that never expires","why did my qr code stop working"],
     title: "Do QR Codes Expire? Static vs Dynamic Codes",
     description: "Why some QR codes stop working, the difference between static and dynamic QR codes, and how to make a free QR code that never expires. Plain-English guide.",
     answer: "A static QR code never expires: the link or text is stored inside the code itself, so it works as long as that link does. Dynamic QR codes point to a redirect on a company's server and can stop working when a trial or subscription ends. The [QR Code Generator](/tools/qr-code) here makes static codes.",
@@ -311,6 +320,7 @@ export const GUIDES: GuideConfig[] = [
   },
   {
     slug: "how-to-compress-image-to-100kb",
+    keywords: ["how to compress image to 100kb","reduce photo size for online form","passport photo 50kb","signature 20kb"],
     title: "How to Compress an Image to 100 KB for Forms",
     description: "Get a photo, passport picture or signature under 100 KB, 50 KB or 20 KB for job portals and online forms: crop, resize, then compress. Free and without uploading.",
     answer: "To get an image under 100 KB, open [Compress Image to 100 KB](/tools/compress-image-to-100kb), add the photo and press Compress. If the result is still too big or blurry, crop it to the required shape and lower its pixel size first; fewer pixels reach small sizes with better quality.",
@@ -352,6 +362,7 @@ export const GUIDES: GuideConfig[] = [
   },
   {
     slug: "how-to-combine-pdf-and-jpg",
+    keywords: ["combine pdf and jpg","merge pdf and jpg into one pdf","add image to pdf","combine photos and pdf"],
     title: "How to Combine PDF and JPG Files Into One PDF",
     description: "Put PDFs and photos or scans into a single PDF in the right order: convert the images, merge everything, then shrink the file if needed. Free and without uploading.",
     answer: "To combine PDF and JPG files, first turn the images into a PDF with [Images to PDF](/tools/images-to-pdf), then add that file and your other PDFs to [Merge PDF](/tools/merge-pdf) and put them in order. If the result is too large to send, shrink it with [Compress PDF](/tools/compress-pdf).",
