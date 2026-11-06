@@ -10,29 +10,26 @@ import { formatBytes, withExtension, type OutputFile } from "@/lib/files";
 import { Panel, ToolLayout } from "@/components/tool/ToolLayout";
 import { ImageGrid } from "@/components/image/ImageGrid";
 import { BeforeAfter } from "@/components/image/BeforeAfter";
+import { TargetSizePicker, formatKb } from "@/components/tool/TargetSizePicker";
 import { Field, Notice, NumberInput, Select, Slider, Toggle } from "@/components/ui/controls";
 
 type FormatChoice = "same" | "image/jpeg" | "image/png" | "image/webp";
 const EXT: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
 
-/** Slider stops for the target size, in KB. */
-const SIZE_STOPS = [20, 50, 100, 150, 200, 300, 500, 750, 1024, 1536, 2048, 3072, 5120, 10240];
-const formatKb = (kb: number) => (kb >= 1024 ? `${(kb / 1024).toFixed(kb % 1024 ? 1 : 0)} MB` : `${kb} KB`);
 
 /** Also mounted by the target-size pages (e.g. /tools/compress-image-to-100kb) with their own slug and size. */
-export default function CompressImage({ slug = "compress-image", initialTargetKb = 200 }: { slug?: string; initialTargetKb?: number }) {
+export default function CompressImage({ slug = "compress-image", initialTargetKb = 100 }: { slug?: string; initialTargetKb?: number }) {
   const list = useFileList(true);
   const processor = useProcessor();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [quality, setQuality] = useState(75);
   const [limitSize, setLimitSize] = useState(true);
-  const [sizeStop, setSizeStop] = useState(() => Math.max(0, SIZE_STOPS.indexOf(initialTargetKb)));
+  const [targetKb, setTargetKb] = useState(initialTargetKb);
   const [format, setFormat] = useState<FormatChoice>("same");
   const [limitDim, setLimitDim] = useState(false);
   const [maxDim, setMaxDim] = useState(1920);
 
   const selected = list.items.find((i) => i.id === selectedId) ?? list.items[0];
-  const targetKb = SIZE_STOPS[sizeStop];
 
   const settingsFor = (file: File): CompressSettings => {
     const same = file.type === "image/png" || file.type === "image/webp" ? file.type : "image/jpeg";
@@ -100,7 +97,7 @@ export default function CompressImage({ slug = "compress-image", initialTargetKb
       options={
         <>
           <Toggle label="Limit file size" hint="Quality is lowered automatically until each image fits." checked={limitSize} onChange={setLimitSize} />
-          {limitSize && <Slider label="Maximum file size" value={sizeStop} onChange={setSizeStop} min={0} max={SIZE_STOPS.length - 1} format={(i) => formatKb(SIZE_STOPS[i])} />}
+          {limitSize && <TargetSizePicker value={targetKb} onChange={setTargetKb} />}
           <Slider
             label={limitSize ? "Starting quality" : "Quality"}
             value={quality}

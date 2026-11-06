@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, CircleCheck, ShieldCheck } from "lucide-react";
-import { CONVERSIONS, SIZE_PAGES, SITE, TOOLS, TOOL_PAGES, getCategory, getTool, relatedTools, toolFaqs } from "@/config/tools.config";
+import { CONVERSIONS, PDF_SIZE_PAGES, SIZE_PAGES, SITE, TOOLS, TOOL_PAGES, getCategory, getTool, relatedTools, toolFaqs } from "@/config/tools.config";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/ui/Badge";
@@ -11,7 +11,7 @@ import { ToolLoader } from "@/components/tool/ToolLoader";
 import { ToolCard } from "@/components/home/ToolCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { guidesForTool } from "@/config/guides";
-import { FORMAT_INFO, TOOL_DETAILS } from "@/config/tool-content";
+import { FORMAT_INFO, MEASURED_RESULTS, SIZE_LIMITS, TOOL_DETAILS } from "@/config/tool-content";
 import { RichText } from "@/components/layout/RichText";
 import { ORGANIZATION_ID, WEBSITE_ID, absoluteUrl, breadcrumbList, pageMetadata } from "@/lib/seo";
 
@@ -41,7 +41,12 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   const faqs = toolFaqs(tool);
   // The converter and its conversion pages link to each other.
   const conversions = tool.slug === "image-converter" || tool.variantOf === "image-converter" ? CONVERSIONS.filter((c) => c.slug !== tool.slug) : [];
-  const sizes = tool.slug === "compress-image" || tool.variantOf === "compress-image" ? SIZE_PAGES.filter((p) => p.slug !== tool.slug) : [];
+  // Target-size pages link to their siblings and to the tool they reuse.
+  const family = tool.variantOf ?? tool.slug;
+  const sizes = [...SIZE_PAGES, ...PDF_SIZE_PAGES].filter((p) => p.variantOf === family && p.slug !== tool.slug);
+  const familyTool = getTool(family);
+  // The two compressors and their target-size pages also show size limits and measured results.
+  const isCompressor = family === "file-compressor" || family === "compress-image";
   const formats = (tool.formats ?? []).filter((f) => FORMAT_INFO[f]);
   const updated = new Date(SITE.updated.content);
   const guides = guidesForTool(tool.slug, ...(tool.variantOf ? [tool.variantOf] : []));
@@ -101,7 +106,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
             <ToolIcon tool={tool} size="lg" />
             <div className="flex flex-1 flex-col gap-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-semibold tracking-tight text-fg sm:text-4xl">{tool.title}</h1>
+                <h1 className="text-3xl font-semibold tracking-tight text-fg sm:text-4xl">{tool.heading ?? tool.title}</h1>
                 {tool.badges.map((b) => (
                   <Badge key={b} badge={b} />
                 ))}
@@ -165,6 +170,77 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
             </section>
           )}
 
+          {isCompressor && (
+            <section aria-labelledby="limits">
+              <h2 id="limits" className="text-2xl font-semibold tracking-tight text-fg">Common file size limits</h2>
+              <p className="mt-3 max-w-3xl text-base leading-relaxed text-fg-muted">
+                Typical limits on forms and portals. Always check the exact size the form asks for, then compress to it.
+              </p>
+              <div className="mt-5 overflow-x-auto rounded-2xl border border-border bg-surface">
+                <table className="w-full min-w-[480px] text-left text-sm">
+                  <thead className="bg-surface-2 text-xs uppercase tracking-wider text-fg-subtle">
+                    <tr>
+                      <th scope="col" className="px-4 py-3 font-semibold">What you are uploading</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Usual limit</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Compress it</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {SIZE_LIMITS.map((row) => {
+                      const target = getTool(row.slug);
+                      return (
+                        <tr key={row.use}>
+                          <td className="px-4 py-3 text-fg">{row.use}</td>
+                          <td className="px-4 py-3 font-medium text-fg tabular-nums">{row.limit}</td>
+                          <td className="px-4 py-3">
+                            {target && target.slug !== tool.slug ? (
+                              <Link href={`/tools/${target.slug}`} className="font-medium text-primary hover:underline">{target.title}</Link>
+                            ) : (
+                              <span className="text-fg-muted">This page</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {isCompressor && (
+            <section aria-labelledby="results">
+              <h2 id="results" className="text-2xl font-semibold tracking-tight text-fg">Real results: from MB to KB</h2>
+              <p className="mt-3 max-w-3xl text-base leading-relaxed text-fg-muted">
+                Measured with these tools in Chrome on a laptop. Your own files may shrink more or less depending on what is in them.
+              </p>
+              <div className="mt-5 overflow-x-auto rounded-2xl border border-border bg-surface">
+                <table className="w-full min-w-[480px] text-left text-sm">
+                  <thead className="bg-surface-2 text-xs uppercase tracking-wider text-fg-subtle">
+                    <tr>
+                      <th scope="col" className="px-4 py-3 font-semibold">File</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Before</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Target</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">After</th>
+                      <th scope="col" className="px-4 py-3 font-semibold">Saved</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border tabular-nums">
+                    {MEASURED_RESULTS.map((row) => (
+                      <tr key={row.file + row.target}>
+                        <td className="px-4 py-3 text-fg">{row.file}</td>
+                        <td className="px-4 py-3 text-fg-muted">{row.before}</td>
+                        <td className="px-4 py-3 text-fg-muted">{row.target}</td>
+                        <td className="px-4 py-3 font-medium text-fg">{row.after}</td>
+                        <td className="px-4 py-3 font-medium text-success-strong">−{row.saved}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
           {formats.map((f) => (
             <section key={f} aria-labelledby={`what-is-${f.toLowerCase()}`}>
               <h2 id={`what-is-${f.toLowerCase()}`} className="text-2xl font-semibold tracking-tight text-fg">What is {f === "AVIF" || f === "SVG" ? "an" : "a"} {f} file?</h2>
@@ -174,19 +250,19 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
 
           {sizes.length > 0 && (
             <section aria-labelledby="sizes">
-              <h2 id="sizes" className="text-2xl font-semibold tracking-tight text-fg">Compress to a specific size</h2>
+              <h2 id="sizes" className="text-2xl font-semibold tracking-tight text-fg">{family === "file-compressor" ? "Compress a PDF to a specific size" : "Compress an image to a specific size"}</h2>
               <ul className="mt-5 flex flex-wrap gap-2">
-                {tool.variantOf && (
+                {tool.variantOf && familyTool && (
                   <li>
-                    <Link href="/tools/compress-image" className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg hover:border-border-strong pointer-coarse:min-h-11">
-                      Any size
+                    <Link href={`/tools/${familyTool.slug}`} className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg hover:border-border-strong pointer-coarse:min-h-11">
+                      Any size ({familyTool?.title})
                     </Link>
                   </li>
                 )}
                 {sizes.map((p) => (
                   <li key={p.slug}>
                     <Link href={`/tools/${p.slug}`} className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:text-fg pointer-coarse:min-h-11">
-                      {p.title.replace("Compress Image to ", "Under ")}
+                      Under {p.title.replace(/^Compress (Image|PDF) to /, "")}
                     </Link>
                   </li>
                 ))}

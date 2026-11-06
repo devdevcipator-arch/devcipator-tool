@@ -3,19 +3,27 @@
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import { ToolSkeleton } from "@/components/tool/ToolSkeleton";
-import { CONVERSIONS, SIZE_PAGES } from "@/config/tools.config";
+import { CONVERSIONS, PDF_SIZE_PAGES, SIZE_PAGES } from "@/config/tools.config";
 
 /** Loading placeholder; pass a height for workspaces much taller than the default one. */
 const sized = (minHeight?: string) => function SizedSkeleton() {
   return <ToolSkeleton minHeight={minHeight} />;
 };
 
+const FileCompressor = dynamic(() => import("./document/FileCompressor"), { ssr: false, loading: sized() });
 const CompressImage = dynamic(() => import("./image/CompressImage"), { ssr: false, loading: sized() });
 const ImageConverter = dynamic(() => import("./image/ImageConverter"), { ssr: false, loading: sized() });
 
 /** Every tool workspace is code-split and only loaded in the browser. */
 export const TOOL_COMPONENTS: Record<string, ComponentType> = {
   // document
+  "file-compressor": FileCompressor,
+  // "Compress PDF to 100 KB" pages mount the file compressor with their own slug and size.
+  ...Object.fromEntries(
+    PDF_SIZE_PAGES.map((p) => [p.slug, function PdfSizeTool() {
+      return <FileCompressor slug={p.slug} initialTargetKb={p.targetKb} />;
+    }]),
+  ),
   "merge-pdf": dynamic(() => import("./document/MergePdf"), { ssr: false, loading: sized() }),
   "compress-pdf": dynamic(() => import("./document/CompressPdf"), { ssr: false, loading: sized() }),
   "split-pdf": dynamic(() => import("./document/SplitPdf"), { ssr: false, loading: sized() }),

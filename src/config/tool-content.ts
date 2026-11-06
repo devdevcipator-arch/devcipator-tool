@@ -19,7 +19,38 @@ export const FORMAT_INFO: Record<string, string> = {
   AVIF: "AVIF is a newer image format based on the AV1 video codec. It compresses photos even more efficiently than WebP and supports transparency and high dynamic range, so more and more websites use it. Support outside browsers is still limited, which is why AVIF images often need converting before you can edit or upload them.",
 };
 
+/** "Common size limits" table on the compressor pages. `slug` is the page that compresses to that size. */
+export const SIZE_LIMITS: Array<{ use: string; limit: string; slug: string }> = [
+  { use: "Scanned signature on an application form", limit: "10–20 KB", slug: "compress-image-to-20kb" },
+  { use: "Passport-size photo for exam and job forms", limit: "20–50 KB", slug: "compress-image-to-50kb" },
+  { use: "Photo or ID upload on job portals", limit: "100 KB", slug: "compress-image-to-100kb" },
+  { use: "Certificates and documents as PDF", limit: "100–200 KB", slug: "compress-pdf-to-200kb" },
+  { use: "Government and university portals", limit: "500 KB", slug: "compress-pdf-to-500kb" },
+  { use: "Upload forms with a 1 MB cap", limit: "1 MB", slug: "compress-pdf-to-1mb" },
+];
+
+/**
+ * Results measured on this site (Chrome on a laptop, November 2026) with test files, shown on the compressor pages.
+ * Re-measure before changing them; real files compress more or less depending on their content.
+ */
+export const MEASURED_RESULTS: Array<{ file: string; before: string; target: string; after: string; saved: string }> = [
+  { file: "3-page PDF of photos", before: "6.2 MB", target: "100 KB", after: "39 KB", saved: "99%" },
+  { file: "10-page PDF of photos", before: "1.9 MB", target: "200 KB", after: "166 KB", saved: "91%" },
+  { file: "10-page PDF of photos", before: "1.9 MB", target: "1 MB", after: "607 KB", saved: "69%" },
+  { file: "3000 × 2000 photo (JPG)", before: "1.9 MB", target: "100 KB", after: "91 KB", saved: "95%" },
+  { file: "3000 × 2000 photo (JPG)", before: "1.9 MB", target: "50 KB", after: "47 KB", saved: "98%" },
+  { file: "3000 × 2000 photo (JPG)", before: "1.9 MB", target: "20 KB", after: "20 KB", saved: "99%" },
+];
+
 export const TOOL_DETAILS: Record<string, ToolDetails> = {
+  "file-compressor": {
+    heading: "Compress any file to 100 KB, 200 KB or 1 MB",
+    paragraphs: [
+      "Schools, offices, job portals and government websites all set upload limits, and the files people need to send, such as scanned certificates, ID cards, mark sheets, application forms and phone photos, are usually far too big. The File Compressor shrinks PDFs and images from several MB down to the exact limit you need: pick 20 KB, 50 KB, 100 KB, 200 KB, 500 KB or 1 MB, or type any size from 5 KB upwards. It accepts PDFs up to 200 MB and images up to 50 MB.",
+      "Each file is compressed only as much as it needs. PDFs start at a sharp 150 DPI and the resolution is lowered step by step until the file fits; photos keep their dimensions where possible and are scaled down only when quality alone isn't enough. Files that are already under the limit are returned unchanged, and iPhone HEIC photos are converted to JPG so every form accepts them. 100 KB is the most common limit on online forms, so it is selected by default.",
+      "To send a Word or Excel document, save it as PDF first and then compress the PDF. If a long PDF can't reach a very small target, remove pages you don't need with [Split PDF](/tools/split-pdf), or use [Compress PDF](/tools/compress-pdf) for a quick size reduction without a fixed target. Our guide on [compressing an image to 100 KB](/guides/how-to-compress-image-to-100kb) covers photos, signatures and passport pictures step by step.",
+    ],
+  },
   // ───────────────────────────── PDF ─────────────────────────────
   "merge-pdf": {
     heading: "When to combine PDF files",
@@ -95,11 +126,11 @@ export const TOOL_DETAILS: Record<string, ToolDetails> = {
   },
   // ───────────────────────────── Image ─────────────────────────────
   "compress-image": {
-    heading: "Shrink photos for email, forms and websites",
+    heading: "Reduce image size in KB: from MB to 100 KB, 50 KB or 20 KB",
     paragraphs: [
-      "Photos from modern phones are often several megabytes, which is too big for many upload forms, email attachments and web pages. Compress Image reduces the file size of JPG, PNG and WebP images by re-encoding them more efficiently, usually with little visible difference.",
-      "If a form says the image must be under 100 KB or 200 KB, set that as the target size and the tool finds a quality that fits. Otherwise, use the quality slider and drag the before-and-after comparison to check the result. You can compress a whole batch of photos at once and download them as a ZIP.",
-      "When an image is still too large, lowering its dimensions with [Resize Image](/tools/resize-image) helps most, and converting photos to WebP with [JPG to WebP](/tools/jpg-to-webp) saves more on websites. See [how to reduce image size](/guides/how-to-reduce-image-size) for a step-by-step approach.",
+      "Photos from modern phones are often 2–5 MB, but online forms, job portals and exam registrations usually accept 100 KB, 50 KB or even 20 KB. Compress Image reduces JPG, PNG and WebP images to the exact size you pick: choose a preset from 20 KB to 1 MB, or type any size in KB. Images up to 50 MB are accepted, and you can compress a whole batch at once and download them as a ZIP.",
+      "To reach the target, quality is lowered step by step; if that is not enough for a very large photo, the image is also scaled down, and the result tells you so. The before-and-after slider lets you check that faces and text are still clear before you download. 100 KB is the most common limit on online forms; passport-size photos are often 50 KB and scanned signatures 20 KB.",
+      "For the clearest result at small sizes, crop the photo to the shape the form wants with [Crop Image](/tools/crop-image) first, and save as JPG, which is accepted everywhere. To compress PDFs and photos together, use the [File Compressor](/tools/file-compressor). Read [how to compress an image to 100 KB](/guides/how-to-compress-image-to-100kb) for a step-by-step guide.",
     ],
   },
   "resize-image": {

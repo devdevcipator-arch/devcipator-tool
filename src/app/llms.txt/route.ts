@@ -1,4 +1,4 @@
-import { CATEGORIES, CONVERSIONS, HOME_FAQS, SIZE_PAGES, SITE, toolsInCategory } from "@/config/tools.config";
+import { CATEGORIES, CONVERSIONS, HOME_FAQS, PDF_SIZE_PAGES, SIZE_PAGES, SITE, toolsInCategory } from "@/config/tools.config";
 import { GUIDES } from "@/config/guides";
 import { plainText } from "@/components/layout/RichText";
 import { absoluteUrl } from "@/lib/seo";
@@ -27,9 +27,9 @@ export function GET() {
     "",
     ...GUIDES.map((g) => `- [${g.title}](${absoluteUrl(`/guides/${g.slug}`)}): ${plainText(g.answer)}`),
     "",
-    "## Compress images to a specific size",
+    "## Compress images and PDFs to a specific size",
     "",
-    ...SIZE_PAGES.map((p) => `- [${p.title}](${absoluteUrl(`/tools/${p.slug}`)}): ${p.description}`),
+    ...[...SIZE_PAGES, ...PDF_SIZE_PAGES].map((p) => `- [${p.title}](${absoluteUrl(`/tools/${p.slug}`)}): ${p.description}`),
     "",
     "## Common questions",
     "",

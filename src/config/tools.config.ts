@@ -23,6 +23,7 @@ import {
   Scaling,
   Scissors,
   Shrink,
+  FileDown,
   Signature,
   Stamp,
   TextCursorInput,
@@ -41,6 +42,8 @@ export interface ToolConfig {
   slug: string;
   /** Page H1 and card title; leads with the tool's main search phrase. */
   title: string;
+  /** Longer H1 for the tool page when the card title is too short to carry the main search phrase. */
+  heading?: string;
   category: ToolCategory;
   icon: LucideIcon;
   badges: ToolBadge[];
@@ -166,6 +169,33 @@ const AUDIO_LABEL = "MP3, WAV, OGG, FLAC, AAC, M4A";
 
 export const TOOLS: ToolConfig[] = [
   // ───────────────────────────── PDF ─────────────────────────────
+  {
+    slug: "file-compressor",
+    title: "File Compressor",
+    heading: "File Compressor: Compress PDF & Images to 100 KB",
+    category: "document",
+    icon: FileDown,
+    badges: ["Popular", "New"],
+    description: "Compress PDFs and photos to 100 KB or any size.",
+    intro: "Make any PDF, photo or scan small enough to upload. Pick a target such as 100 KB or 200 KB and every file is compressed to fit, from several MB down to a few KB. Files already under the limit are left as they are, and nothing is uploaded.",
+    seoTitle: "File Compressor – PDF & Images to 100KB",
+    metaDescription: "Compress PDF, JPG, PNG and HEIC files to 100 KB, 200 KB or any size in KB for forms and email. Free, batch, and your files never leave your device.",
+    accept: [...PDF, ...IMAGES, ...HEIC],
+    acceptLabel: "PDF, JPG, PNG, WebP, HEIC",
+    maxSizeMB: 200,
+    multiple: true,
+    keywords: ["file compressor", "compress file", "compress file to 100kb", "reduce file size", "compress pdf to 100kb", "compress pdf to 200kb", "compress file online", "compress documents for upload", "file size reducer", "compress file in kb"],
+    steps: ["Add PDFs and photos, together or one at a time.", "Pick a target size such as 100 KB, or type any size in KB.", "Compress, then download each file or all of them as a ZIP."],
+    features: ["PDF, JPG, PNG, WebP and iPhone HEIC in one place", "Target sizes from 20 KB to 1 MB, or any size in KB", "Files already under the target are kept unchanged", "Batch compression with ZIP download"],
+    faqs: [
+      { q: "How do I compress a file to 100 KB?", a: "Add the file, keep 100 KB selected and press Compress. Each file is made smaller than 100 KB and the result shows the size before and after." },
+      { q: "Which files can I compress?", a: "PDFs and images: JPG, PNG, WebP and iPhone HEIC photos. For a Word or Excel document, save it as PDF first (File › Save as › PDF), then compress the PDF." },
+      { q: "What is the most common size limit?", a: "100 KB is the most common limit on job portals and online application forms. Passport-size photos are often limited to 50 KB and signatures to 20 KB; email attachments usually allow a few MB." },
+      { q: "How small can a PDF get?", a: "A one- or two-page scan usually fits under 100 KB. Long documents need more space per page to stay readable, so the tool tells you if a file could not reach the target and gives you the smallest readable version." },
+      { q: "Will the compressed PDF still be readable?", a: "Yes. The tool starts at high quality and lowers the resolution only as far as needed to fit. Pages are saved as images, so their text can't be selected afterwards." },
+    ],
+    related: ["compress-pdf", "compress-image", "images-to-pdf", "split-pdf"],
+  },
   {
     slug: "merge-pdf",
     title: "Merge PDF",
@@ -402,22 +432,24 @@ export const TOOLS: ToolConfig[] = [
     category: "image",
     icon: ImageDown,
     badges: ["Popular", "Batch"],
-    description: "Shrink JPG, PNG and WebP with a live before/after preview.",
-    intro: "Reduce image file size with a target size and quality slider, and compare the result against the original before downloading. Compression runs on your device, so your photos are never uploaded.",
-    seoTitle: "Compress Image Online – JPG, PNG, WebP",
-    metaDescription: "Reduce image file size without visible quality loss. Set a target size in KB, compare before and after, and batch-compress JPG, PNG and WebP with no upload.",
+    heading: "Compress Image to 100 KB, 50 KB or 20 KB",
+    description: "Shrink photos to 100 KB, 50 KB or any size in KB.",
+    intro: "Reduce any photo from several MB down to 100 KB, 50 KB or even 20 KB for online forms, job portals and email. Pick a target size, compare before and after, and download. Images are compressed on your device and never uploaded.",
+    seoTitle: "Compress Image to 100KB, 50KB or 20KB",
+    metaDescription: "Compress JPG, PNG and WebP images to 100 KB, 50 KB, 20 KB or any size in KB. Free batch compression with a before/after preview, and no upload.",
     accept: IMAGES,
     acceptLabel: IMAGE_LABEL,
     maxSizeMB: 50,
     multiple: true,
-    keywords: ["compress image", "compress jpg", "compress png", "reduce image size", "compress image to 100kb", "compress jpg online without losing quality", "image size reducer", "reduce photo file size", "image compressor"],
-    steps: ["Add one or more images.", "Set the maximum file size, quality and output format.", "Compare before/after and download."],
-    features: ["Target maximum size in KB/MB", "Quality slider with live preview", "Draggable before/after comparison", "Runs in a Web Worker"],
+    keywords: ["compress image", "image compressor", "compress image to 100kb", "compress image to 50kb", "compress image to 20kb", "compress image in kb", "reduce image size in kb", "compress jpg", "compress png", "reduce photo file size", "compress jpg online without losing quality"],
+    steps: ["Add one or more JPG, PNG or WebP images.", "Pick a target size such as 100 KB, or type an exact size in KB.", "Compare before and after, then download the smaller images."],
+    features: ["Target size presets from 20 KB to 1 MB, or any KB", "Reaches the target even from multi-MB photos", "Draggable before/after comparison", "Batch compression with ZIP download"],
     faqs: [
-      { q: "How do I compress an image to 100 KB?", a: "Set the maximum size to 100 KB and compress. The quality is lowered step by step until the file fits under the limit." },
+      { q: "How do I compress an image to 100 KB?", a: "Pick 100 KB as the target size and press Compress. Quality is lowered step by step, and very large photos are also scaled down, until the file fits under 100 KB." },
+      { q: "What is the most common image size limit?", a: "100 KB is the most common limit on job portals and online application forms. Passport-size photos are often limited to 50 KB and scanned signatures to 20 KB, so check what the form asks for." },
       { q: "Will compression reduce image quality?", a: "Lossy formats trade a little detail for size, but at 75–85% quality the difference is hard to see. Use the before/after slider to check before you download." },
       { q: "Which format compresses best?", a: "WebP is usually 25–35% smaller than JPG at the same visual quality. PNG is best for graphics with flat colours." },
-      { q: "Can I compress an image to 50 KB or 20 KB?", a: "Yes. Set the target size anywhere from 20 KB to 10 MB. If an image can't reach a very small target, also lower its maximum width and height." },
+      { q: "Can I compress an image to 50 KB or 20 KB?", a: "Yes. Pick 50 KB or 20 KB, or type any size from 5 KB upwards. If lowering the quality isn't enough, the image is also scaled down until it fits, and the result tells you." },
       { q: "Is it safe to compress passport and ID photos here?", a: "Yes. Images are compressed inside your browser and never uploaded, so nobody else can see your documents." },
       { q: "Can I change the format while compressing?", a: "Yes. Keep the original format or save as JPG, PNG or WebP. JPG and WebP give much smaller files for photos." },
     ],
@@ -1125,8 +1157,52 @@ export const SIZE_PAGES: ToolConfig[] = [
   }),
 ];
 
+function pdfSizePage(kb: number, label: string, use: string, faqs: ToolFaq[]): ToolConfig {
+  return {
+    slug: `compress-pdf-to-${label.toLowerCase().replace(" ", "")}`,
+    title: `Compress PDF to ${label}`,
+    category: "document",
+    icon: FileDown,
+    badges: ["Batch"],
+    description: `Shrink PDFs to under ${label} for ${use}.`,
+    intro: `Compress a PDF to ${label} for ${use}. The target is already set: each PDF is compressed only as much as needed to fit, starting at the best quality. Files are processed on your device and never uploaded.`,
+    seoTitle: `Compress PDF to ${label} – Free, No Upload`,
+    metaDescription: `Compress a PDF to ${label} for free, for ${use}. Each PDF is shrunk only as much as needed, with no sign-up and no upload.`,
+    accept: PDF,
+    acceptLabel: "PDF",
+    maxSizeMB: 200,
+    multiple: true,
+    keywords: [`compress pdf to ${label.toLowerCase()}`, `reduce pdf size to ${label.toLowerCase()}`, `pdf to ${label.toLowerCase()}`, `compress pdf under ${label.toLowerCase()}`, `compress pdf to ${label.toLowerCase().replace(" ", "")} online`],
+    steps: ["Add one or more PDFs.", `The target is already set to ${label}; change it if you need to.`, `Compress and download PDFs under ${label}.`],
+    features: [`Target preset to ${label}`, "Starts at the best quality that fits", "Several PDFs at once", "No upload: runs on your device"],
+    faqs,
+    related: ["compress-pdf", "split-pdf", "merge-pdf"],
+    variantOf: "file-compressor",
+    targetKb: kb,
+  };
+}
+
+export const PDF_SIZE_PAGES: ToolConfig[] = [
+  pdfSizePage(100, "100 KB", "online forms and job applications", [
+    { q: "How do I compress a PDF to 100 KB?", a: "Add the PDF and press Compress; the 100 KB target is already set. The tool lowers the page resolution only as far as needed and shows the size before and after." },
+    { q: "Can a long PDF fit in 100 KB?", a: "One- or two-page scans usually fit. For longer documents, remove pages you don't need with Split PDF first, or pick a larger target if the form allows it." },
+  ]),
+  pdfSizePage(200, "200 KB", "admission forms and document portals", [
+    { q: "How do I reduce a PDF to 200 KB?", a: "Add the PDF and press Compress; the 200 KB target is preset. Several pages of a scanned document usually fit at a clearly readable quality." },
+    { q: "Will the text still be readable?", a: "Yes. The tool starts at high quality and only lowers it as far as needed. Pages become images, so text can't be selected afterwards." },
+  ]),
+  pdfSizePage(500, "500 KB", "email and government portals", [
+    { q: "How do I make a PDF smaller than 500 KB?", a: "Add it and press Compress; 500 KB is already selected. Most scanned documents of a few pages fit with little visible change." },
+    { q: "Why not just zip the PDF?", a: "Zipping barely shrinks a PDF, and many portals don't accept ZIP files. Compressing the PDF itself keeps it a normal PDF that opens anywhere." },
+  ]),
+  pdfSizePage(1024, "1 MB", "email attachments and uploads", [
+    { q: "How do I compress a PDF to under 1 MB?", a: "Add it and press Compress; the 1 MB target is preset. Large scans and photo-heavy PDFs usually fit with almost no visible difference." },
+    { q: "My PDF is already under 1 MB. What happens?", a: "Files already under the target are returned unchanged, so you never get a worse copy of a file that already fits." },
+  ]),
+];
+
 /** Every /tools page: the tools themselves plus the conversion and target-size pages that reuse one of them. */
-export const TOOL_PAGES: ToolConfig[] = [...TOOLS, ...CONVERSIONS, ...SIZE_PAGES];
+export const TOOL_PAGES: ToolConfig[] = [...TOOLS, ...CONVERSIONS, ...SIZE_PAGES, ...PDF_SIZE_PAGES];
 
 export const TOOL_MAP: Record<string, ToolConfig> = Object.fromEntries(TOOL_PAGES.map((t) => [t.slug, t]));
 
@@ -1148,7 +1224,7 @@ export function relatedTools(tool: ToolConfig, limit = 6): ToolConfig[] {
   return [...explicit, ...sameCategory].slice(0, limit);
 }
 
-export const POPULAR_TOOLS = ["merge-pdf", "sign-pdf", "compress-image", "audio-cutter", "qr-code", "images-to-pdf"];
+export const POPULAR_TOOLS = ["file-compressor", "compress-image", "merge-pdf", "sign-pdf", "qr-code", "images-to-pdf"];
 
 export const SITE = {
   name: "Devcipator Tools",
@@ -1228,6 +1304,10 @@ export const HOME_FAQS: ToolFaq[] = [
   {
     q: "Which file formats are supported?",
     a: `PDF tools work with PDF files. Image tools accept ${IMAGE_LABEL}. Audio tools accept ${AUDIO_LABEL} and other formats your browser can decode, and export MP3 or WAV.`,
+  },
+  {
+    q: "How do I compress a file to 100 KB?",
+    a: "Open the File Compressor, add your PDF or photo and keep 100 KB selected, then press Compress. It works for PDFs, JPG, PNG, WebP and iPhone HEIC photos, and you can pick other sizes such as 20 KB, 50 KB, 200 KB or 1 MB.",
   },
   {
     q: "Does it work on my phone?",

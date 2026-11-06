@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { Shrink } from "lucide-react";
-import { useProcessor, throwIfAborted, yieldToMain } from "@/hooks/useProcessor";
+import { useProcessor } from "@/hooks/useProcessor";
 import { usePdfDocument } from "@/hooks/usePdfDocument";
-import { canvasToBytes, renderPage } from "@/lib/pdf/pdfjs";
-import { pdfBlob, pdfWorker } from "@/lib/pdf/client";
-import type { RasterPage } from "@/lib/pdf/api";
+import { rasterizePdf } from "@/lib/pdf/compress";
 import { formatBytes, withExtension } from "@/lib/files";
 import { Panel, ToolLayout } from "@/components/tool/ToolLayout";
 import { PdfPageCanvas } from "@/components/pdf/PdfPageCanvas";
@@ -14,7 +12,7 @@ import { Notice, Segmented } from "@/components/ui/controls";
 
 type Level = "strong" | "recommended" | "light";
 
-/** Render resolution and JPEG quality per level. 72 points = 1 inch, so scale = DPI / 72. */
+/** Render resolution and JPEG quality per level. */
 const LEVELS: Record<Level, { dpi: number; quality: number }> = {
   strong: { dpi: 72, quality: 0.5 },
   recommended: { dpi: 110, quality: 0.65 },
@@ -29,24 +27,8 @@ export default function CompressPdf() {
 
   async function compress() {
     if (!doc || !file) return;
-    const { dpi, quality } = LEVELS[level];
     await processor.run(async ({ report, signal }) => {
-      const pages: RasterPage[] = [];
-      for (let n = 1; n <= numPages; n++) {
-        throwIfAborted(signal);
-        report(((n - 1) / numPages) * 0.85, `Compressing page ${n} of ${numPages}`);
-        const page = await doc.getPage(n);
-        const size = page.getViewport({ scale: 1 });
-        const canvas = await renderPage(page, { scale: dpi / 72 });
-        const bytes = await canvasToBytes(canvas, "image/jpeg", quality);
-        pages.push({ bytes, format: "jpg", pixelWidth: canvas.width, pixelHeight: canvas.height, pageWidth: size.width, pageHeight: size.height, margin: 0 });
-        canvas.width = canvas.height = 0;
-        page.cleanup();
-        await yieldToMain();
-      }
-      report(0.9, "Building the compressed PDF");
-      const out = await pdfWorker().call("images", [pages, undefined], { signal, transfer: pages.map((p) => p.bytes.buffer as ArrayBuffer) });
-      const blob = pdfBlob(out);
+      const blob = await rasterizePdf(doc, LEVELS[level], { signal, onProgress: report });
       const saved = 1 - blob.size / file.size;
       const note = `${formatBytes(file.size)} → ${formatBytes(blob.size)}`;
       if (saved <= 0.02) {
