@@ -17,10 +17,12 @@ import {
   Pipette,
   QrCode,
   RefreshCw,
+  ArrowRightLeft,
   Rewind,
   RotateCw,
   Scaling,
   Scissors,
+  Shrink,
   Signature,
   Stamp,
   TextCursorInput,
@@ -64,6 +66,10 @@ export interface ToolConfig {
   faqs: ToolFaq[];
   /** Listed first under "Related tools"; may point to other categories. */
   related: string[];
+  /** Set on conversion pages (see CONVERSIONS): the tool whose workspace they reuse. */
+  variantOf?: string;
+  /** Output format a conversion page starts on. */
+  convertTo?: "image/jpeg" | "image/png" | "image/webp";
 }
 
 export interface CategoryConfig {
@@ -88,14 +94,14 @@ export const CATEGORIES: CategoryConfig[] = [
     id: "document",
     label: "PDF",
     title: "PDF tools",
-    tagline: "Merge, split, sign, organize and convert PDFs.",
-    seoTitle: "Free PDF Tools – Merge, Split, Sign",
-    metaDescription: "Free online PDF tools to merge, split, sign, rotate, organize and number PDFs, or convert them to and from images. No upload: files stay on your device.",
+    tagline: "Merge, compress, split, sign and convert PDFs.",
+    seoTitle: "Free PDF Tools – Merge, Compress, Sign",
+    metaDescription: "Free online PDF tools to merge, compress, split, sign, rotate and organize PDFs, or convert them to and from images. No upload: files stay on your device.",
     applicationCategory: "BusinessApplication",
     aboutTitle: "Edit PDFs without uploading them",
     about: [
       "Most online PDF tools send your document to a server, process it there and send it back. These don't. Merging, splitting, signing and converting all happen inside your browser using pdf-lib and Mozilla's PDF.js, so contracts, invoices and ID scans never leave your device. There is no account to create and no watermark on the result.",
-      "Use Merge PDF to combine several files into one, and Split PDF or Organize PDF to pull out, reorder or delete pages. Rotate PDF fixes sideways scans, Add Page Numbers stamps “Page 1 of 10” style numbers, and Sign PDF lets you draw or upload a signature and place it on any page.",
+      "Use Merge PDF to combine several files into one, Compress PDF to shrink a file for email, and Split PDF or Organize PDF to pull out, reorder or delete pages. Rotate PDF fixes sideways scans, Add Page Numbers stamps “Page 1 of 10” style numbers, and Sign PDF lets you draw or upload a signature and place it on any page.",
       "To move between formats, Images to PDF turns JPG and PNG photos into a paginated document, and PDF to Images exports pages as PNG or JPG at up to 300 DPI. Page operations copy the original content rather than re-rendering it, so text stays sharp and searchable.",
     ],
   },
@@ -177,6 +183,31 @@ export const TOOLS: ToolConfig[] = [
       { q: "Can I merge password-protected PDFs?", a: "No. Encrypted PDFs are flagged in the list; remove the password in your PDF reader first." },
     ],
     related: ["split-pdf", "organize-pdf", "images-to-pdf"],
+  },
+  {
+    slug: "compress-pdf",
+    title: "Compress PDF",
+    category: "document",
+    icon: Shrink,
+    badges: ["New"],
+    description: "Reduce PDF file size for email and upload limits.",
+    intro: "Make a PDF smaller so it fits email attachments and upload forms. Choose strong, balanced or light compression and see the new size straight away. The PDF is compressed on your device and never uploaded.",
+    seoTitle: "Compress PDF – Reduce PDF Size Free",
+    metaDescription: "Reduce PDF file size online for free. Pick strong, balanced or light compression and see the size saved. No sign-up, and your PDF never leaves your device.",
+    accept: PDF,
+    acceptLabel: "PDF",
+    maxSizeMB: 200,
+    multiple: false,
+    keywords: ["compress pdf", "reduce pdf size", "compress pdf free", "make pdf smaller", "pdf compressor", "shrink pdf", "compress pdf for email", "compress pdf without uploading"],
+    steps: ["Drop the PDF you want to make smaller.", "Choose strong, balanced or light compression.", "Compress and download the smaller PDF."],
+    features: ["Three compression levels", "Shows original and new file size", "Works best on scans and image-heavy PDFs", "No upload: runs on your device"],
+    faqs: [
+      { q: "How does Compress PDF make the file smaller?", a: "Each page is redrawn as a compressed JPG image at a lower resolution and saved into a new PDF. Scanned documents and PDFs full of photos usually shrink the most." },
+      { q: "Will I still be able to select and search the text?", a: "No. Because pages are saved as images, text in the compressed PDF can't be selected, copied or searched. Keep your original file if you need that." },
+      { q: "Which compression level should I pick?", a: "Balanced suits most documents. Strong gives the smallest file for email or strict upload limits, and Light keeps more detail for printing or zooming in." },
+      { q: "Why is my compressed PDF not smaller?", a: "PDFs that are mostly plain text are already compact, and turning their pages into images can make them bigger. The tool tells you when that happens so you can keep the original." },
+    ],
+    related: ["compress-image", "split-pdf", "merge-pdf"],
   },
   {
     slug: "split-pdf",
@@ -762,7 +793,171 @@ export const TOOLS: ToolConfig[] = [
   },
 ];
 
-export const TOOL_MAP: Record<string, ToolConfig> = Object.fromEntries(TOOLS.map((t) => [t.slug, t]));
+// ─────────────────────── Conversion pages ───────────────────────
+// Landing pages for the most searched format pairs. Each reuses the Image Converter workspace with its target
+// format preselected, and has its own copy, so it answers that one query rather than repeating the converter page.
+// They are not listed as separate tools in the grid, footer or search.
+
+interface ConversionSpec {
+  from: string;
+  to: "JPG" | "PNG" | "WebP";
+  /** One-liner for cards and llms.txt. */
+  description: string;
+  intro: string;
+  metaDescription: string;
+  extraKeywords: string[];
+  features: string[];
+  faqs: ToolFaq[];
+}
+
+const MIME = { JPG: "image/jpeg", PNG: "image/png", WebP: "image/webp" } as const;
+
+function conversion(spec: ConversionSpec): ToolConfig {
+  const slug = `${spec.from}-to-${spec.to}`.toLowerCase();
+  const pair = `${spec.from} to ${spec.to}`;
+  return {
+    slug,
+    title: `${pair} Converter`,
+    category: "image",
+    icon: ArrowRightLeft,
+    badges: ["Batch"],
+    description: spec.description,
+    intro: spec.intro,
+    seoTitle: `${pair} Converter – Free, No Upload`,
+    metaDescription: spec.metaDescription,
+    accept: [...IMAGES, "image/svg+xml", ".svg"],
+    acceptLabel: `${spec.from}, or any other common image`,
+    maxSizeMB: 50,
+    multiple: true,
+    keywords: [`${pair.toLowerCase()}`, `convert ${pair.toLowerCase()}`, `${pair.toLowerCase()} converter`, `${pair.toLowerCase()} free`, ...spec.extraKeywords],
+    steps: [`Add one or more ${spec.from} images.`, `${spec.to} is already selected; adjust the options if you like.`, `Convert and download each ${spec.to} or all of them as a ZIP.`],
+    features: spec.features,
+    faqs: spec.faqs,
+    related: ["image-converter", "compress-image", "resize-image"],
+    variantOf: "image-converter",
+    convertTo: MIME[spec.to],
+  };
+}
+
+export const CONVERSIONS: ToolConfig[] = [
+  conversion({
+    from: "PNG",
+    to: "JPG",
+    description: "Turn PNG images into smaller JPG files.",
+    intro: "Convert PNG images to JPG in bulk. JPG files are usually much smaller for photos and open in every app. Transparent areas are filled with a colour you choose, and the conversion runs on your device, with no upload.",
+    metaDescription: "Convert PNG to JPG online for free, one image or a whole batch. Pick the quality and a background for transparent areas. Your images are never uploaded.",
+    extraKeywords: ["png to jpeg", "change png to jpg", "png to jpg high quality"],
+    features: ["Batch conversion with ZIP download", "Quality slider", "Background colour for transparent PNGs", "Runs in your browser"],
+    faqs: [
+      { q: "Why convert PNG to JPG?", a: "JPG compresses photos far better than PNG, so the same picture usually becomes a much smaller file. That helps with email attachments, upload limits and faster websites." },
+      { q: "What happens to transparent parts of my PNG?", a: "JPG has no transparency, so transparent pixels are filled with the background colour you choose. White is the default." },
+      { q: "Does converting PNG to JPG lose quality?", a: "JPG is a lossy format, so a little detail is lost. At 85–90% quality the difference is hard to see in photos; screenshots with sharp text are better kept as PNG." },
+    ],
+  }),
+  conversion({
+    from: "JPG",
+    to: "PNG",
+    description: "Convert JPG photos to lossless PNG.",
+    intro: "Convert JPG or JPEG images to PNG in bulk, for apps and upload forms that ask for PNG or for editing without adding more compression. Everything happens on your device, so your photos are never uploaded.",
+    metaDescription: "Convert JPG and JPEG images to PNG online for free, in bulk. PNG is lossless, so no extra quality is lost. No sign-up, and your photos stay on your device.",
+    extraKeywords: ["jpeg to png", "change jpg to png", "jpg to png high quality"],
+    features: ["Batch conversion with ZIP download", "Lossless PNG output", "Keeps the original dimensions", "Runs in your browser"],
+    faqs: [
+      { q: "Will converting JPG to PNG improve quality?", a: "No. PNG stores the image without further loss, but it can't bring back detail the JPG compression already removed. It stops the quality getting worse with each edit." },
+      { q: "Why is my PNG bigger than the JPG?", a: "PNG is lossless, so photos take more space than in JPG. That is normal; use PNG when an app requires it or you plan to keep editing." },
+      { q: "Can I make the background transparent?", a: "Converting doesn't remove a background. A JPG has no transparency, so the PNG keeps the same solid background as the original photo." },
+    ],
+  }),
+  conversion({
+    from: "WebP",
+    to: "JPG",
+    description: "Convert WebP images into JPG that opens anywhere.",
+    intro: "Images saved from websites are often WebP, which some apps and upload forms still reject. Convert WebP to JPG in bulk so they open everywhere. The conversion runs in your browser and nothing is uploaded.",
+    metaDescription: "Convert WebP to JPG online for free, in bulk. Turn images saved from websites into JPG files that open in any app. No upload: images stay on your device.",
+    extraKeywords: ["webp to jpeg", "change webp to jpg", "open webp file as jpg"],
+    features: ["Batch conversion with ZIP download", "Quality slider", "Background colour for transparent WebP", "Runs in your browser"],
+    faqs: [
+      { q: "Why do saved images download as WebP?", a: "Many websites serve WebP because it is smaller than JPG at the same quality. Your browser saves the file in the format the site sent." },
+      { q: "How do I convert WebP to JPG?", a: "Add the WebP files here, keep JPG selected, choose the quality and press Convert. Download each JPG or all of them as a ZIP." },
+      { q: "Is the JPG bigger than the WebP?", a: "Usually a little, because WebP compresses better. Lower the quality slider if you need a smaller file." },
+    ],
+  }),
+  conversion({
+    from: "WebP",
+    to: "PNG",
+    description: "Convert WebP to PNG and keep transparency.",
+    intro: "Convert WebP images to PNG in bulk, keeping any transparent areas intact. PNG works in almost every editor and design tool. The images are converted on your device and never uploaded.",
+    metaDescription: "Convert WebP to PNG online for free and keep transparency. Batch convert images saved from websites into PNG for any editor. Nothing is uploaded.",
+    extraKeywords: ["webp to png transparent", "change webp to png"],
+    features: ["Keeps transparency", "Lossless PNG output", "Batch conversion with ZIP download", "Runs in your browser"],
+    faqs: [
+      { q: "Does WebP to PNG keep transparency?", a: "Yes. PNG supports transparency, so transparent areas stay transparent unless you turn on the background fill." },
+      { q: "Should I choose PNG or JPG?", a: "Pick PNG for logos, icons, screenshots and anything transparent. Pick JPG for photos where a smaller file matters more." },
+      { q: "Are animated WebP files supported?", a: "Animated images are converted using their first frame, so the PNG is a still image." },
+    ],
+  }),
+  conversion({
+    from: "JPG",
+    to: "WebP",
+    description: "Make JPG photos smaller as WebP for the web.",
+    intro: "Convert JPG photos to WebP to make them smaller for websites, blogs and online stores. Every modern browser displays WebP. Choose the quality and convert a whole batch on your device, with no upload.",
+    metaDescription: "Convert JPG to WebP online for free to make images smaller for your website. Set the quality and batch convert. Your photos are never uploaded.",
+    extraKeywords: ["jpeg to webp", "convert images to webp for website"],
+    features: ["Smaller files for faster pages", "Quality slider", "Batch conversion with ZIP download", "Runs in your browser"],
+    faqs: [
+      { q: "How much smaller is WebP than JPG?", a: "WebP is often around 25–35% smaller than JPG at similar visual quality, though the saving depends on the photo." },
+      { q: "Do all browsers support WebP?", a: "All current versions of Chrome, Edge, Firefox and Safari display WebP. Some older desktop apps may still need JPG." },
+      { q: "Which quality should I use?", a: "75–85% is a good starting point for websites. Compare the result and go lower if the file is still too large." },
+    ],
+  }),
+  conversion({
+    from: "PNG",
+    to: "WebP",
+    description: "Shrink PNG images as WebP, with transparency.",
+    intro: "Convert PNG images to WebP for much smaller files on your website while keeping transparency. Batch convert logos, screenshots and graphics in your browser; nothing is uploaded.",
+    metaDescription: "Convert PNG to WebP online for free. Get much smaller images for your website while keeping transparency. Batch convert with no upload to a server.",
+    extraKeywords: ["png to webp transparent", "convert png to webp for website"],
+    features: ["Keeps transparency", "Quality slider", "Batch conversion with ZIP download", "Runs in your browser"],
+    faqs: [
+      { q: "Does PNG to WebP keep transparency?", a: "Yes. WebP supports transparency, so transparent areas stay transparent." },
+      { q: "Why is WebP smaller than PNG?", a: "WebP uses more efficient compression. At the quality setting here it is lossy, which gives the biggest saving for photos and detailed graphics." },
+      { q: "When should I keep PNG instead?", a: "Keep PNG when you need a lossless master file to edit later, or when the place you upload to doesn't accept WebP." },
+    ],
+  }),
+  conversion({
+    from: "SVG",
+    to: "PNG",
+    description: "Turn SVG vector graphics into PNG images.",
+    intro: "Convert SVG logos, icons and illustrations to PNG so you can use them in documents, slides and apps that don't support vector files. Transparency is kept, and the SVG is converted on your device.",
+    metaDescription: "Convert SVG to PNG online for free and keep the transparent background. Use logos and icons anywhere vectors aren't supported. Nothing is uploaded.",
+    extraKeywords: ["svg to png transparent", "svg to image", "convert svg logo to png"],
+    features: ["Keeps transparent backgrounds", "Batch conversion with ZIP download", "Uses the SVG's own dimensions", "Runs in your browser"],
+    faqs: [
+      { q: "What size will the PNG be?", a: "The PNG uses the width and height set in the SVG file. To make it larger, convert it and then use Resize Image, or edit the SVG's width and height first." },
+      { q: "Is the background transparent?", a: "Yes, transparent areas in the SVG stay transparent in the PNG unless you turn on the background fill." },
+      { q: "Why does my SVG look different?", a: "SVGs that load external fonts or images may render without them, because the file is drawn on its own in your browser." },
+    ],
+  }),
+  conversion({
+    from: "AVIF",
+    to: "JPG",
+    description: "Convert AVIF images into widely supported JPG.",
+    intro: "AVIF images are small but still not accepted by many apps and upload forms. Convert AVIF to JPG in bulk so they open everywhere. Your browser decodes and converts the files on your device.",
+    metaDescription: "Convert AVIF to JPG online for free, in bulk. Turn AVIF images into JPG files that open in any app or upload form. No upload: files stay on your device.",
+    extraKeywords: ["avif to jpeg", "open avif file", "avif converter"],
+    features: ["Batch conversion with ZIP download", "Quality slider", "Background colour for transparent AVIF", "Runs in your browser"],
+    faqs: [
+      { q: "What is an AVIF file?", a: "AVIF is a modern image format that makes files smaller than JPG. Websites use it more and more, but many apps can't open it yet." },
+      { q: "Which browsers can convert AVIF?", a: "Conversion uses your browser's own decoder. Current Chrome, Edge, Firefox and Safari 16 or later can read AVIF." },
+      { q: "Will the JPG be larger?", a: "Usually yes, because AVIF compresses very efficiently. Lower the quality slider if you need a smaller JPG." },
+    ],
+  }),
+];
+
+/** Every /tools page: the tools themselves plus the conversion pages that reuse one of them. */
+export const TOOL_PAGES: ToolConfig[] = [...TOOLS, ...CONVERSIONS];
+
+export const TOOL_MAP: Record<string, ToolConfig> = Object.fromEntries(TOOL_PAGES.map((t) => [t.slug, t]));
 
 export function getTool(slug: string): ToolConfig | undefined {
   return TOOL_MAP[slug];
@@ -789,7 +984,7 @@ export const SITE = {
   shortName: "Devcipator",
   /** Publisher name used in structured data. */
   organization: "Devcipator",
-  organizationUrl: "https://devcipator.com/",
+  organizationUrl: "https://www.devcipator.com/",
   logo: "/devcipator-logo.png",
   description: "Free, private, in-browser tools for PDFs, images, audio and everyday tasks. Files never leave your device.",
   /** Meta keywords for pages without their own (home, privacy, terms). */
@@ -805,19 +1000,18 @@ export const SITE = {
     "no upload file tools",
     "private browser tools",
   ],
-  // VERCEL_PROJECT_PRODUCTION_URL is set by Vercel at build time (host only, no scheme).
+  // The public domain. Vercel builds point canonicals here rather than at the *.vercel.app host, which redirects to it.
   url:
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000"),
+    process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL ? "https://tools.devcipator.com" : "http://localhost:3000"),
   /** Sitemap lastModified dates. Bump `content` when tool or category copy changes, `legal` when privacy or terms change. */
-  updated: { content: "2026-10-30", legal: "2026-10-24" },
+  updated: { content: "2026-11-06", legal: "2026-10-24" },
 };
 
 /** <title> and description for the fixed pages. Titles of pages other than home get the layout's “| Devcipator Tools” suffix. */
 export const PAGE_SEO = {
   home: {
     title: "Free PDF, Image & Audio Tools – No Upload | Devcipator Tools",
-    description: "25 free online tools to merge and sign PDFs, compress images, cut audio and make QR codes. Everything runs in your browser, so files never leave your device.",
+    description: `${TOOLS.length} free online tools to merge and compress PDFs, convert images, cut audio and make QR codes. Everything runs in your browser, so files stay on your device.`,
   },
   privacy: {
     title: "Privacy Policy",
@@ -827,7 +1021,39 @@ export const PAGE_SEO = {
     title: "Terms of Use",
     description: "The terms for using Devcipator Tools, the free in-browser PDF, image, audio and utility tools: your content, acceptable use, and the no-warranty clause.",
   },
+  guides: {
+    title: "Guides: PDF and Image How-Tos",
+    description: "Practical guides to compressing, merging and signing PDFs and choosing image formats, each with a free tool that works in your browser without uploads.",
+  },
+  about: {
+    title: "About Devcipator Tools",
+    description: `Devcipator Tools is a free set of ${TOOLS.length} PDF, image, audio and utility tools by Devcipator. Every tool runs in your browser, so files are never uploaded.`,
+  },
 };
+
+/** Shown on the home page and marked up as its FAQPage. Keep the answers to facts the code supports. */
+export const HOME_FAQS: ToolFaq[] = [
+  {
+    q: "What is Devcipator Tools?",
+    a: `Devcipator Tools is a free collection of ${TOOLS.length} online tools for PDFs, images, audio and everyday tasks, made by Devcipator. You can merge, split and sign PDFs, compress and convert images, cut and join audio, and make QR codes and barcodes, all in your web browser.`,
+  },
+  {
+    q: "Are my files uploaded to a server?",
+    a: "No. Every tool processes files inside your browser using Web APIs, Web Workers and WebAssembly. Your files are never uploaded, stored or seen by anyone else, and closing the tab discards them.",
+  },
+  {
+    q: "Do I need to sign up or pay?",
+    a: "No. All tools are free to use with no account, no sign-up and no watermark added to your files.",
+  },
+  {
+    q: "Which file formats are supported?",
+    a: `PDF tools work with PDF files. Image tools accept ${IMAGE_LABEL}. Audio tools accept ${AUDIO_LABEL} and other formats your browser can decode, and export MP3 or WAV.`,
+  },
+  {
+    q: "Does it work on my phone?",
+    a: "Yes. The tools run in any modern browser on desktop, tablet or phone. Very large files are limited by your device's memory, because the work happens on the device itself.",
+  },
+];
 
 /** A tool's own FAQs followed by the questions every tool page answers. */
 export function toolFaqs(tool: ToolConfig): ToolFaq[] {

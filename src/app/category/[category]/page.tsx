@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
-import { CATEGORIES, getCategory, toolsInCategory } from "@/config/tools.config";
+import { CATEGORIES, CONVERSIONS, getCategory, toolsInCategory } from "@/config/tools.config";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { cn } from "@/lib/cn";
 import { ToolCard } from "@/components/home/ToolCard";
@@ -74,6 +74,20 @@ export default async function CategoryPage({ params }: PageProps<"/category/[cat
           </li>
         ))}
       </ul>
+      {cat.id === "image" && (
+        <section aria-labelledby="conversions" className="mt-14">
+          <h2 id="conversions" className="text-2xl font-semibold tracking-tight text-fg">Popular image conversions</h2>
+          <ul className="mt-5 flex flex-wrap gap-2">
+            {CONVERSIONS.map((c) => (
+              <li key={c.slug}>
+                <Link href={`/tools/${c.slug}`} className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:text-fg pointer-coarse:min-h-11">
+                  {c.title.replace(" Converter", "")}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <section aria-labelledby="about" className="mt-14 max-w-3xl">
         <h2 id="about" className="text-2xl font-semibold tracking-tight text-fg">{cat.aboutTitle}</h2>
         <div className="mt-4 flex flex-col gap-4 text-base leading-relaxed text-fg-muted">

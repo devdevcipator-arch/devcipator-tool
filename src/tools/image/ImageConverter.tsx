@@ -11,10 +11,11 @@ import { Panel, ToolLayout } from "@/components/tool/ToolLayout";
 import { ImageGrid } from "@/components/image/ImageGrid";
 import { ColorInput, Segmented, Slider, Toggle } from "@/components/ui/controls";
 
-export default function ImageConverter() {
+/** Also mounted by the conversion pages (e.g. /tools/png-to-jpg) with their own slug and target format. */
+export default function ImageConverter({ slug = "image-converter", initialFormat = "image/jpeg" }: { slug?: string; initialFormat?: OutputFormat }) {
   const list = useFileList(true);
   const processor = useProcessor();
-  const [format, setFormat] = useState<OutputFormat>("image/jpeg");
+  const [format, setFormat] = useState<OutputFormat>(initialFormat);
   const [quality, setQuality] = useState(90);
   const [fill, setFill] = useState(false);
   const [background, setBackground] = useState("#ffffff");
@@ -49,7 +50,7 @@ export default function ImageConverter() {
 
   return (
     <ToolLayout
-      slug="image-converter"
+      slug={slug}
       fileCount={list.items.length}
       onFiles={list.add}
       onReset={list.clear}

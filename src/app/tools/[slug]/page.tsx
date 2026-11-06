@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, CircleCheck, ShieldCheck } from "lucide-react";
-import { TOOLS, getCategory, getTool, relatedTools, toolFaqs } from "@/config/tools.config";
+import { CONVERSIONS, SITE, TOOLS, TOOL_PAGES, getCategory, getTool, relatedTools, toolFaqs } from "@/config/tools.config";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/ui/Badge";
@@ -10,10 +10,11 @@ import { ToolIcon } from "@/components/tool/ToolIcon";
 import { ToolLoader } from "@/components/tool/ToolLoader";
 import { ToolCard } from "@/components/home/ToolCard";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { guidesForTool } from "@/config/guides";
 import { ORGANIZATION_ID, WEBSITE_ID, absoluteUrl, breadcrumbList, pageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
-  return TOOLS.map((t) => ({ slug: t.slug }));
+  return TOOL_PAGES.map((t) => ({ slug: t.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/tools/[slug]">): Promise<Metadata> {
@@ -36,6 +37,10 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   const related = relatedTools(tool, 6);
 
   const faqs = toolFaqs(tool);
+  // The converter and its conversion pages link to each other.
+  const conversions = tool.slug === "image-converter" || tool.variantOf === "image-converter" ? CONVERSIONS.filter((c) => c.slug !== tool.slug) : [];
+  const updated = new Date(SITE.updated.content);
+  const guides = guidesForTool(tool.variantOf ?? tool.slug);
   const url = absoluteUrl(`/tools/${tool.slug}`);
 
   const graph = [
@@ -52,6 +57,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       featureList: tool.features,
       inLanguage: "en",
+      dateModified: SITE.updated.content,
       isPartOf: { "@id": WEBSITE_ID },
       publisher: { "@id": ORGANIZATION_ID },
     },
@@ -104,6 +110,9 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
                   <span className={cn("size-2 rounded-full", style.solid)} aria-hidden /> {category.title}
                 </span>
                 {tool.acceptLabel && <span>Accepts {tool.acceptLabel}</span>}
+                <span>
+                  Updated <time dateTime={SITE.updated.content}>{updated.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}</time>
+                </span>
               </p>
             </div>
           </div>
@@ -139,6 +148,45 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
               ))}
             </ul>
           </section>
+
+          {conversions.length > 0 && (
+            <section aria-labelledby="conversions">
+              <h2 id="conversions" className="text-2xl font-semibold tracking-tight text-fg">
+                {tool.variantOf ? "Other image conversions" : "Popular conversions"}
+              </h2>
+              <ul className="mt-5 flex flex-wrap gap-2">
+                {tool.variantOf && (
+                  <li>
+                    <Link href="/tools/image-converter" className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg hover:border-border-strong pointer-coarse:min-h-11">
+                      All formats
+                    </Link>
+                  </li>
+                )}
+                {conversions.map((c) => (
+                  <li key={c.slug}>
+                    <Link href={`/tools/${c.slug}`} className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:text-fg pointer-coarse:min-h-11">
+                      {c.title.replace(" Converter", "")}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {guides.length > 0 && (
+            <section aria-labelledby="guides">
+              <h2 id="guides" className="text-2xl font-semibold tracking-tight text-fg">Guides</h2>
+              <ul className="mt-5 flex flex-col gap-2">
+                {guides.map((g) => (
+                  <li key={g.slug}>
+                    <Link href={`/guides/${g.slug}`} className="text-fg-muted underline hover:text-fg pointer-coarse:inline-block pointer-coarse:py-2">
+                      {g.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section aria-labelledby="faq">
             <h2 id="faq" className="text-2xl font-semibold tracking-tight text-fg">Frequently asked questions</h2>

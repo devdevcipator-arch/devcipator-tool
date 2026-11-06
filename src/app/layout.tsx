@@ -63,7 +63,9 @@ const SITE_GRAPH = [
     "@type": "Organization",
     "@id": ORGANIZATION_ID,
     name: SITE.organization,
-    url: absoluteUrl("/"),
+    // The company's own site; this one is a product of it (WebSite.publisher points back here).
+    url: SITE.organizationUrl,
+    description: `${SITE.organization} makes ${SITE.name}, free in-browser tools for PDFs, images, audio and everyday tasks.`,
     logo: { "@type": "ImageObject", url: absoluteUrl(SITE.logo), width: 924, height: 192 },
   },
   {

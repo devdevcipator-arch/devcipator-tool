@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ProsePage } from "@/components/layout/Prose";
 import { PAGE_SEO, SITE } from "@/config/tools.config";
 import { pageMetadata } from "@/lib/seo";
@@ -19,8 +20,9 @@ export default function PrivacyPage() {
       </p>
       <h2>Downloaded engines and models</h2>
       <p>
-        Some tools download processing engines on first use — for example the FFmpeg audio engine or on-device image segmentation models.
-        These are served from this website and cached by your browser. They contain no information about you.
+        Some tools load extra processing code on first use, such as the PDF.js engine that draws PDF pages and the image compression
+        library. These files are served from this website, not a third-party CDN, and are cached by your browser. They contain no
+        information about you.
       </p>
       <h2>Local storage</h2>
       <p>
@@ -28,7 +30,17 @@ export default function PrivacyPage() {
         them to you. This data stays on your device and you can clear it at any time.
       </p>
       <h2>Contact</h2>
-      <p>Questions about privacy can be raised through the project&apos;s repository.</p>
+      <p>
+        {SITE.name} is made by{" "}
+        <a href={SITE.organizationUrl} className="font-medium text-fg underline">
+          {SITE.organization}
+        </a>
+        . Questions about privacy can be sent through the Devcipator website. See also{" "}
+        <Link href="/about" className="font-medium text-fg underline">
+          About {SITE.name}
+        </Link>
+        .
+      </p>
     </ProsePage>
   );
 }

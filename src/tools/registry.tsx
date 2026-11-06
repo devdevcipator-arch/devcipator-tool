@@ -3,16 +3,20 @@
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import { ToolSkeleton } from "@/components/tool/ToolSkeleton";
+import { CONVERSIONS } from "@/config/tools.config";
 
 /** Loading placeholder; pass a height for workspaces much taller than the default one. */
 const sized = (minHeight?: string) => function SizedSkeleton() {
   return <ToolSkeleton minHeight={minHeight} />;
 };
 
+const ImageConverter = dynamic(() => import("./image/ImageConverter"), { ssr: false, loading: sized() });
+
 /** Every tool workspace is code-split and only loaded in the browser. */
 export const TOOL_COMPONENTS: Record<string, ComponentType> = {
   // document
   "merge-pdf": dynamic(() => import("./document/MergePdf"), { ssr: false, loading: sized() }),
+  "compress-pdf": dynamic(() => import("./document/CompressPdf"), { ssr: false, loading: sized() }),
   "split-pdf": dynamic(() => import("./document/SplitPdf"), { ssr: false, loading: sized() }),
   "organize-pdf": dynamic(() => import("./document/OrganizePdf"), { ssr: false, loading: sized() }),
   "images-to-pdf": dynamic(() => import("./document/ImagesToPdf"), { ssr: false, loading: sized() }),
@@ -23,7 +27,13 @@ export const TOOL_COMPONENTS: Record<string, ComponentType> = {
   // image
   "compress-image": dynamic(() => import("./image/CompressImage"), { ssr: false, loading: sized() }),
   "resize-image": dynamic(() => import("./image/ResizeImage"), { ssr: false, loading: sized() }),
-  "image-converter": dynamic(() => import("./image/ImageConverter"), { ssr: false, loading: sized() }),
+  "image-converter": ImageConverter,
+  // Conversion pages (png-to-jpg, …) mount the converter with their own slug and target format.
+  ...Object.fromEntries(
+    CONVERSIONS.map((c) => [c.slug, function ConversionTool() {
+      return <ImageConverter slug={c.slug} initialFormat={c.convertTo} />;
+    }]),
+  ),
   "crop-image": dynamic(() => import("./image/CropImage"), { ssr: false, loading: sized() }),
   "rotate-flip-image": dynamic(() => import("./image/RotateFlipImage"), { ssr: false, loading: sized() }),
   "watermark-image": dynamic(() => import("./image/WatermarkImage"), { ssr: false, loading: sized() }),

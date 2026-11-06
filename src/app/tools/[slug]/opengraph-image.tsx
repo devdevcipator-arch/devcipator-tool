@@ -1,8 +1,8 @@
-import { SITE, TOOLS, getCategory, getTool } from "@/config/tools.config";
+import { SITE, TOOL_PAGES, getCategory, getTool } from "@/config/tools.config";
 import { OG_CONTENT_TYPE, OG_SIZE, ogImage } from "@/lib/og";
 
 export function generateStaticParams() {
-  return TOOLS.map((t) => ({ slug: t.slug }));
+  return TOOL_PAGES.map((t) => ({ slug: t.slug }));
 }
 
 // Used instead of a static `alt` export so the alt text can name the tool.
