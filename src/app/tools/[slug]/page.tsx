@@ -11,6 +11,8 @@ import { ToolLoader } from "@/components/tool/ToolLoader";
 import { ToolCard } from "@/components/home/ToolCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { guidesForTool } from "@/config/guides";
+import { TOOL_DETAILS } from "@/config/tool-content";
+import { RichText } from "@/components/layout/RichText";
 import { ORGANIZATION_ID, WEBSITE_ID, absoluteUrl, breadcrumbList, pageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -41,6 +43,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   const conversions = tool.slug === "image-converter" || tool.variantOf === "image-converter" ? CONVERSIONS.filter((c) => c.slug !== tool.slug) : [];
   const updated = new Date(SITE.updated.content);
   const guides = guidesForTool(tool.variantOf ?? tool.slug);
+  const details = TOOL_DETAILS[tool.slug];
   const url = absoluteUrl(`/tools/${tool.slug}`);
 
   const graph = [
@@ -148,6 +151,17 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
               ))}
             </ul>
           </section>
+
+          {details && (
+            <section aria-labelledby="details">
+              <h2 id="details" className="text-2xl font-semibold tracking-tight text-fg">{details.heading}</h2>
+              <div className="mt-5 flex max-w-3xl flex-col gap-4 text-base leading-relaxed text-fg-muted">
+                {details.paragraphs.map((p) => (
+                  <p key={p}><RichText text={p} /></p>
+                ))}
+              </div>
+            </section>
+          )}
 
           {conversions.length > 0 && (
             <section aria-labelledby="conversions">

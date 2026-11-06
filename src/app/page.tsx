@@ -6,9 +6,16 @@ import { CATEGORY_STYLE } from "@/lib/category-style";
 import { cn } from "@/lib/cn";
 import { ToolExplorer } from "@/components/home/ToolExplorer";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { RichText } from "@/components/layout/RichText";
 import { WEBSITE_ID, absoluteUrl, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({ title: { absolute: PAGE_SEO.home.title }, description: PAGE_SEO.home.description, path: "/" });
+
+const HOME_INTRO = [
+  "Devcipator Tools brings everyday PDF, image and audio jobs together in one place, free and without sign-up. [Merge PDF](/tools/merge-pdf) files into one, [compress a PDF](/tools/compress-pdf) for email, [split a PDF](/tools/split-pdf) into separate pages or [sign a PDF](/tools/sign-pdf) without printing it. Turn photos into a PDF with [JPG to PDF](/tools/images-to-pdf), or save PDF pages as pictures with [PDF to JPG](/tools/pdf-to-images).",
+  "For images, [compress images](/tools/compress-image) to a target size such as 100 KB, [resize](/tools/resize-image) and [crop photos](/tools/crop-image), and convert formats like [PNG to JPG](/tools/png-to-jpg) and [WebP to JPG](/tools/webp-to-jpg). For audio, the [MP3 cutter](/tools/audio-cutter) trims songs and makes ringtones, while [Audio Joiner](/tools/audio-joiner) merges tracks into one. Everyday helpers include a [QR code generator](/tools/qr-code), a [barcode generator](/tools/barcode-generator) and a [word counter](/tools/word-counter).",
+  "Unlike most online converters, nothing is uploaded: each tool runs inside your web browser, on your computer or phone, so private documents, photos and recordings never leave your device. There are no watermarks, no daily limits and no account to create. New to a task? Our [guides](/guides) explain how to do it step by step.",
+];
 
 const PILLARS = [
   { icon: ShieldCheck, title: "Private by default", text: "Files are processed locally with Web APIs and WebAssembly. Nothing is uploaded." },
@@ -76,6 +83,15 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </section>
+
+        <section aria-labelledby="about-tools" className="mt-16 max-w-3xl">
+          <h2 id="about-tools" className="text-2xl font-semibold tracking-tight text-fg">Free online file tools that don&apos;t upload your files</h2>
+          <div className="mt-5 flex flex-col gap-4 text-base leading-relaxed text-fg-muted">
+            {HOME_INTRO.map((p) => (
+              <p key={p}><RichText text={p} /></p>
+            ))}
+          </div>
         </section>
 
         <section aria-labelledby="faq" className="mt-16 max-w-3xl">
