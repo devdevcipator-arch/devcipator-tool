@@ -4,12 +4,13 @@ import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { useFileList } from "@/hooks/useFileList";
 import { useProcessor, throwIfAborted } from "@/hooks/useProcessor";
-import { transformImage } from "@/lib/image/client";
+import { transformBitmap, transformImage } from "@/lib/image/client";
+import { decodeHeic, isHeicFile } from "@/lib/image/heic";
 import { EXT, type OutputFormat } from "@/lib/image/ops";
 import { errorMessage, withExtension, type OutputFile } from "@/lib/files";
 import { Panel, ToolLayout } from "@/components/tool/ToolLayout";
 import { ImageGrid } from "@/components/image/ImageGrid";
-import { ColorInput, Segmented, Slider, Toggle } from "@/components/ui/controls";
+import { ColorInput, Notice, Segmented, Slider, Toggle } from "@/components/ui/controls";
 
 /** Also mounted by the conversion pages (e.g. /tools/png-to-jpg) with their own slug and target format. */
 export default function ImageConverter({ slug = "image-converter", initialFormat = "image/jpeg" }: { slug?: string; initialFormat?: OutputFormat }) {
@@ -32,11 +33,9 @@ export default function ImageConverter({ slug = "image-converter", initialFormat
         const file = items[i].file;
         report(i / items.length, `Converting ${file.name}`);
         try {
-          const res = await transformImage(
-            file,
-            { format, quality: quality / 100, background: opaque || fill ? background : undefined },
-            { signal },
-          );
+          const ops = { format, quality: quality / 100, background: opaque || fill ? background : undefined };
+          // Browsers can't decode HEIC themselves, so it is decoded to a bitmap first.
+          const res = isHeicFile(file) ? await transformBitmap(await decodeHeic(file), ops) : await transformImage(file, ops, { signal });
           out.push({ name: withExtension(file.name, EXT[format]), blob: res.blob, note: EXT[format].toUpperCase() });
         } catch (err) {
           if (signal.aborted) throw err;
@@ -73,6 +72,9 @@ export default function ImageConverter({ slug = "image-converter", initialFormat
           {lossy && <Slider label="Quality" value={quality} onChange={setQuality} min={10} max={100} format={(v) => `${v}%`} />}
           {!opaque && <Toggle label="Fill transparent areas" checked={fill} onChange={setFill} />}
           {(opaque || fill) && <ColorInput label="Background colour" value={background} onChange={setBackground} />}
+          {list.items.some((i) => isHeicFile(i.file)) && (
+            <Notice tone="info">HEIC photos are decoded on your device, which takes a few seconds per photo (longer for very large ones).</Notice>
+          )}
           <p className="text-xs text-fg-subtle">Animated GIFs are converted using their first frame.</p>
         </>
       }

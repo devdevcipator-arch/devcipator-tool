@@ -159,6 +159,8 @@ export const CATEGORIES: CategoryConfig[] = [
 const PDF = ["application/pdf", ".pdf"];
 const IMAGES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp", "image/avif", ".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".avif"];
 const AUDIO = ["audio/*", ".mp3", ".wav", ".ogg", ".oga", ".flac", ".aac", ".m4a", ".opus", ".webm"];
+/** iPhone photos. Only the Image Converter and its conversion pages decode these (see lib/image/heic.ts). */
+const HEIC = ["image/heic", "image/heif", ".heic", ".heif"];
 const IMAGE_LABEL = "JPG, PNG, WebP, GIF, BMP, AVIF";
 const AUDIO_LABEL = "MP3, WAV, OGG, FLAC, AAC, M4A";
 
@@ -289,7 +291,7 @@ export const TOOLS: ToolConfig[] = [
       { q: "Is image quality reduced?", a: "No. JPG and PNG files are embedded as-is; other formats are converted losslessly to PNG." },
       { q: "Which page size should I choose?", a: "Fit to image keeps each page the exact shape of its photo. Choose A4 or Letter when the PDF will be printed or submitted as a document." },
       { q: "Can I combine JPG and PNG images in one PDF?", a: "Yes. Add any mix of JPG and PNG images and they are placed in one PDF, one image per page, in the order you set." },
-      { q: "Can I convert iPhone HEIC photos?", a: "HEIC isn't supported here yet. On iPhone, sharing a photo or setting Camera › Formats to Most Compatible saves it as JPG, which you can then add." },
+      { q: "Can I convert iPhone HEIC photos?", a: "Convert them to JPG with HEIC to JPG first, then add the JPGs here. To have your iPhone save JPG from now on, set Camera › Formats to Most Compatible." },
       { q: "Can I convert JPG to PDF on my phone?", a: "Yes. Images to PDF works in the browser on Android and iPhone, so you can turn photos of documents into a PDF without an app." },
     ],
     related: ["pdf-to-images", "merge-pdf", "image-converter", "compress-image"],
@@ -452,14 +454,14 @@ export const TOOLS: ToolConfig[] = [
     icon: RefreshCw,
     badges: ["Batch"],
     description: "Convert images between JPG, PNG, WebP and BMP.",
-    intro: "Convert any browser-readable image to JPG, PNG, WebP or BMP in bulk, with quality control and a background fill for transparent images. Conversion happens locally, with no upload.",
+    intro: "Convert any common image, including iPhone HEIC photos, to JPG, PNG, WebP or BMP in bulk, with quality control and a background fill for transparent images. Conversion happens locally, with no upload.",
     seoTitle: "Image Converter – PNG, JPG, WebP Free",
     metaDescription: "Convert images between JPG, PNG, WebP and BMP in bulk: PNG to JPG, WebP to JPG, SVG to PNG and more. Free, with quality control and no upload to a server.",
-    accept: [...IMAGES, "image/svg+xml", ".svg"],
-    acceptLabel: `${IMAGE_LABEL}, SVG`,
+    accept: [...IMAGES, ...HEIC, "image/svg+xml", ".svg"],
+    acceptLabel: `${IMAGE_LABEL}, HEIC, SVG`,
     maxSizeMB: 50,
     multiple: true,
-    keywords: ["image converter", "png to jpg", "webp to jpg", "webp to png", "jpg to png", "svg to png", "convert image to jpg", "image format converter"],
+    keywords: ["image converter", "png to jpg", "heic to jpg", "webp to jpg", "webp to png", "jpg to png", "svg to png", "convert image to jpg", "image format converter"],
     steps: ["Add images in any common format.", "Pick JPG, PNG, WebP or BMP and the quality.", "Convert and download one by one or as a ZIP."],
     features: ["JPG, PNG, WebP and BMP output", "Quality control for lossy formats", "Background colour for transparency", "ZIP download for batches"],
     faqs: [
@@ -847,7 +849,7 @@ function conversion(spec: ConversionSpec): ToolConfig {
     intro: spec.intro,
     seoTitle: `${pair} Converter – Free, No Upload`,
     metaDescription: spec.metaDescription,
-    accept: [...IMAGES, "image/svg+xml", ".svg"],
+    accept: [...IMAGES, ...HEIC, "image/svg+xml", ".svg"],
     acceptLabel: `${spec.from}, or any other common image`,
     maxSizeMB: 50,
     multiple: true,
@@ -863,6 +865,20 @@ function conversion(spec: ConversionSpec): ToolConfig {
 }
 
 export const CONVERSIONS: ToolConfig[] = [
+  conversion({
+    from: "HEIC",
+    to: "JPG",
+    description: "Convert iPhone HEIC photos to JPG.",
+    intro: "iPhones save photos as HEIC, which Windows, many websites and upload forms can't open. Convert HEIC to JPG in bulk so your photos work everywhere. The photos are decoded and converted on your device, never uploaded.",
+    metaDescription: "Convert HEIC to JPG online for free. Turn iPhone photos into JPG files that open on Windows, Android and any website. Batch convert, with no upload.",
+    extraKeywords: ["heic to jpeg", "iphone photo to jpg", "open heic file on windows", "convert heic"],
+    features: ["Reads iPhone HEIC and HEIF photos", "Batch conversion with ZIP download", "Quality slider", "Runs in your browser"],
+    faqs: [
+      { q: "What is a HEIC file?", a: "HEIC is the format iPhones and iPads use for photos since iOS 11. It makes photos about half the size of JPG, but Windows, Android apps and many websites can't open it." },
+      { q: "Are my iPhone photos uploaded to convert them?", a: "No. The HEIC decoder runs inside your browser, so your photos never leave your device. It downloads once, about 3 MB, the first time you convert a HEIC photo." },
+      { q: "How do I stop my iPhone saving HEIC?", a: "In the iPhone Settings app, open Camera › Formats and choose Most Compatible. New photos are then saved as JPG." },
+    ],
+  }),
   conversion({
     from: "PNG",
     to: "JPG",

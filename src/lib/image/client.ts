@@ -17,6 +17,21 @@ export function imageWorker() {
 
 const workerCapable = () => typeof OffscreenCanvas !== "undefined" && "convertToBlob" in OffscreenCanvas.prototype;
 
+/** Runs image ops on an already decoded bitmap (e.g. a HEIC photo) and closes it. */
+export async function transformBitmap(bitmap: ImageBitmap, ops: ImageOps): Promise<ImageResult> {
+  try {
+    const make = (w: number, h: number) => {
+      const c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(w));
+      c.height = Math.max(1, Math.round(h));
+      return c;
+    };
+    return await runOps(bitmap, bitmap.width, bitmap.height, ops, make);
+  } finally {
+    bitmap.close();
+  }
+}
+
 /** Runs image ops in the worker when possible; SVG (and old browsers) fall back to the main thread. */
 export async function transformImage(blob: Blob, ops: ImageOps, opts?: CallOptions): Promise<ImageResult> {
   if (blob.type !== "image/svg+xml" && workerCapable()) {

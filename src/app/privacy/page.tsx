@@ -20,8 +20,8 @@ export default function PrivacyPage() {
       </p>
       <h2>Downloaded engines and models</h2>
       <p>
-        Some tools load extra processing code on first use, such as the PDF.js engine that draws PDF pages and the image compression
-        library. These files are served from this website, not a third-party CDN, and are cached by your browser. They contain no
+        Some tools load extra processing code on first use, such as the PDF.js engine that draws PDF pages, the image compression
+        library and the HEIC decoder for iPhone photos. These files are served from this website, not a third-party CDN, and are cached by your browser. They contain no
         information about you.
       </p>
       <h2>Local storage</h2>

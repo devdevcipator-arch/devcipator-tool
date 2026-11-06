@@ -17,6 +17,7 @@ const ENGINES = [
   ["PDF.js (Mozilla)", "draws PDF page thumbnails and exports pages as images"],
   ["Canvas API", "resizes, crops, rotates, converts and watermarks images"],
   ["browser-image-compression", "compresses JPG, PNG and WebP images to a target size"],
+  ["libheif (via heic-to)", "decodes iPhone HEIC photos so they can be converted"],
   ["Web Audio API and LAME", "decode, edit and re-encode audio as WAV or MP3"],
   ["Web Workers", "run heavy work in background threads so the page stays responsive"],
 ] as const;

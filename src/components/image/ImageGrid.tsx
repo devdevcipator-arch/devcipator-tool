@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { X } from "lucide-react";
 import type { FileItem } from "@/hooks/useFileList";
 import { useObjectUrl } from "@/hooks/useObjectUrl";
@@ -23,11 +23,15 @@ function Tile({
   caption?: string;
 }) {
   const url = useObjectUrl(item.file);
+  // Formats the browser can't display (e.g. HEIC in most browsers) show their extension instead of a broken image.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const ext = item.file.name.split(".").pop()?.toUpperCase() ?? "";
   return (
     <li className={cn("group relative flex flex-col gap-1.5 rounded-xl border bg-surface p-1.5", selected ? "border-primary ring-2 ring-primary/30" : "border-border")}>
       <button type="button" onClick={onSelect} className="bg-checker flex aspect-square items-center justify-center overflow-hidden rounded-lg cursor-pointer" aria-label={`Preview ${item.file.name}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        {url && <img src={url} alt="" className="max-h-full max-w-full object-contain" style={imageStyle} />}
+        {url && failedUrl !== url && <img src={url} alt="" onError={() => setFailedUrl(url)} className="max-h-full max-w-full object-contain" style={imageStyle} />}
+        {url && failedUrl === url && <span className="font-mono text-sm font-semibold text-fg-muted">{ext}</span>}
       </button>
       <div className="flex items-center gap-1 px-0.5">
         <div className="min-w-0 flex-1">
