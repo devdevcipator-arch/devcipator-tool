@@ -5,7 +5,7 @@ import { ImageDown } from "lucide-react";
 import { useFileList } from "@/hooks/useFileList";
 import { useProcessor, throwIfAborted } from "@/hooks/useProcessor";
 import { useObjectUrl } from "@/hooks/useObjectUrl";
-import { compressImage, useImageCompressor, type CompressSettings } from "@/hooks/useImageCompressor";
+import { compressToTarget, useImageCompressor, type CompressSettings } from "@/hooks/useImageCompressor";
 import { formatBytes, withExtension, type OutputFile } from "@/lib/files";
 import { Panel, ToolLayout } from "@/components/tool/ToolLayout";
 import { ImageGrid } from "@/components/image/ImageGrid";
@@ -19,13 +19,14 @@ const EXT: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "
 const SIZE_STOPS = [20, 50, 100, 150, 200, 300, 500, 750, 1024, 1536, 2048, 3072, 5120, 10240];
 const formatKb = (kb: number) => (kb >= 1024 ? `${(kb / 1024).toFixed(kb % 1024 ? 1 : 0)} MB` : `${kb} KB`);
 
-export default function CompressImage() {
+/** Also mounted by the target-size pages (e.g. /tools/compress-image-to-100kb) with their own slug and size. */
+export default function CompressImage({ slug = "compress-image", initialTargetKb = 200 }: { slug?: string; initialTargetKb?: number }) {
   const list = useFileList(true);
   const processor = useProcessor();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [quality, setQuality] = useState(75);
   const [limitSize, setLimitSize] = useState(true);
-  const [sizeStop, setSizeStop] = useState(4);
+  const [sizeStop, setSizeStop] = useState(() => Math.max(0, SIZE_STOPS.indexOf(initialTargetKb)));
   const [format, setFormat] = useState<FormatChoice>("same");
   const [limitDim, setLimitDim] = useState(false);
   const [maxDim, setMaxDim] = useState(1920);
@@ -55,13 +56,15 @@ export default function CompressImage() {
       const out: OutputFile[] = [];
       let before = 0;
       let after = 0;
+      let scaled = 0;
       for (let i = 0; i < items.length; i++) {
         throwIfAborted(signal);
         const file = items[i].file;
         const settings = settingsFor(file);
-        const result = await compressImage(file, settings, signal, (p) => report((i + p / 100) / items.length, `Compressing ${file.name}`));
+        const { file: result, scaledTo } = await compressToTarget(file, settings, signal, (p) => report((i + p / 100) / items.length, `Compressing ${file.name}`));
+        if (scaledTo) scaled++;
         // Never hand back something bigger than the original in the same format.
-        const keepOriginal = result.size >= file.size && settings.fileType === file.type && !settings.maxWidthOrHeight;
+        const keepOriginal = result.size >= file.size && settings.fileType === file.type && !settings.maxWidthOrHeight && !scaledTo;
         const blob = keepOriginal ? file : result;
         before += file.size;
         after += blob.size;
@@ -69,7 +72,7 @@ export default function CompressImage() {
         out.push({
           name: withExtension(file.name, EXT[settings.fileType], keepOriginal ? "" : "-compressed"),
           blob,
-          note: keepOriginal ? "Already optimal" : saved >= 0 ? `−${saved}%` : `+${-saved}%`,
+          note: (keepOriginal ? "Already optimal" : saved >= 0 ? `−${saved}%` : `+${-saved}%`) + (scaledTo ? ` · max ${scaledTo}px` : ""),
         });
       }
       const missed = limitSize ? out.filter((o) => o.blob.size > targetKb * 1024).length : 0;
@@ -77,6 +80,7 @@ export default function CompressImage() {
         files: out,
         message:
           `${formatBytes(before)} → ${formatBytes(after)} (−${Math.max(0, Math.round((1 - after / before) * 100))}% total).` +
+          (scaled ? ` ${scaled} image${scaled === 1 ? " was" : "s were"} also scaled down to reach ${formatKb(targetKb)}.` : "") +
           (missed ? ` ${missed} image${missed === 1 ? "" : "s"} could not reach ${formatKb(targetKb)} — try lowering the dimensions.` : ""),
       };
     });
@@ -86,7 +90,7 @@ export default function CompressImage() {
 
   return (
     <ToolLayout
-      slug="compress-image"
+      slug={slug}
       fileCount={list.items.length}
       onFiles={list.add}
       onReset={list.clear}

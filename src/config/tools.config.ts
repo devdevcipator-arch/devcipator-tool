@@ -70,6 +70,10 @@ export interface ToolConfig {
   variantOf?: string;
   /** Output format a conversion page starts on. */
   convertTo?: "image/jpeg" | "image/png" | "image/webp";
+  /** Source and target format names on a conversion page, e.g. ["PNG", "JPG"]; each gets a "What is …?" section. */
+  formats?: [string, string];
+  /** Target size in KB a "compress image to …" page starts on. */
+  targetKb?: number;
 }
 
 export interface CategoryConfig {
@@ -181,6 +185,9 @@ export const TOOLS: ToolConfig[] = [
       { q: "How do I combine multiple PDF files into one?", a: "Add your PDFs, drag them into the order you want, then press Merge. The combined file downloads straight away, with every page copied exactly as it was." },
       { q: "Is there a limit on how many PDFs I can merge?", a: "There is no set number of files. Each PDF can be up to 200 MB; beyond that, the limit is your device's memory, since the merge runs in your browser." },
       { q: "Can I merge password-protected PDFs?", a: "No. Encrypted PDFs are flagged in the list; remove the password in your PDF reader first." },
+      { q: "Can I merge PDF and JPG files together?", a: "Turn the images into a PDF with Images to PDF first, then merge that file with your other PDFs here." },
+      { q: "How do I reduce the size of a merged PDF?", a: "Merging keeps every page at full quality, so the result is about the size of all files added together. If it is too big to send, run it through Compress PDF." },
+      { q: "Can I merge PDFs on a phone or Mac?", a: "Yes. Merge PDF works in any modern browser on Windows, Mac, Linux, Android and iPhone, with nothing to install." },
     ],
     related: ["split-pdf", "organize-pdf", "images-to-pdf"],
   },
@@ -206,6 +213,9 @@ export const TOOLS: ToolConfig[] = [
       { q: "Will I still be able to select and search the text?", a: "No. Because pages are saved as images, text in the compressed PDF can't be selected, copied or searched. Keep your original file if you need that." },
       { q: "Which compression level should I pick?", a: "Balanced suits most documents. Strong gives the smallest file for email or strict upload limits, and Light keeps more detail for printing or zooming in." },
       { q: "Why is my compressed PDF not smaller?", a: "PDFs that are mostly plain text are already compact, and turning their pages into images can make them bigger. The tool tells you when that happens so you can keep the original." },
+      { q: "How do I reduce the size of a scanned PDF?", a: "Scanned PDFs are made of page images, so they shrink the most. Use Balanced for documents you will read on screen, or Strong if you need the smallest possible file." },
+      { q: "Can I compress a PDF to a specific size, like 1 MB?", a: "There is no exact size setting, but the result shows the new size before you download. If Strong is still too big, remove pages you don't need with Split PDF and compress again." },
+      { q: "Can I compress a PDF on my phone?", a: "Yes. Compress PDF runs in the browser on Android phones, iPhones and tablets, so there is no app to install." },
     ],
     related: ["compress-image", "split-pdf", "merge-pdf"],
   },
@@ -278,6 +288,9 @@ export const TOOLS: ToolConfig[] = [
       { q: "How do I convert multiple JPGs into one PDF?", a: "Add all the images at once, drag them into order and create the PDF. Each image becomes one page of the same document." },
       { q: "Is image quality reduced?", a: "No. JPG and PNG files are embedded as-is; other formats are converted losslessly to PNG." },
       { q: "Which page size should I choose?", a: "Fit to image keeps each page the exact shape of its photo. Choose A4 or Letter when the PDF will be printed or submitted as a document." },
+      { q: "Can I combine JPG and PNG images in one PDF?", a: "Yes. Add any mix of JPG and PNG images and they are placed in one PDF, one image per page, in the order you set." },
+      { q: "Can I convert iPhone HEIC photos?", a: "HEIC isn't supported here yet. On iPhone, sharing a photo or setting Camera › Formats to Most Compatible saves it as JPG, which you can then add." },
+      { q: "Can I convert JPG to PDF on my phone?", a: "Yes. Images to PDF works in the browser on Android and iPhone, so you can turn photos of documents into a PDF without an app." },
     ],
     related: ["pdf-to-images", "merge-pdf", "image-converter", "compress-image"],
   },
@@ -302,6 +315,7 @@ export const TOOLS: ToolConfig[] = [
       { q: "Which DPI should I use?", a: "150 DPI is good for screens, 300 DPI for printing. Higher DPI means larger files." },
       { q: "Can I convert only one page of a PDF to JPG?", a: "Yes. Enter a page range such as “3” or “2-5” and only those pages are exported." },
       { q: "Should I choose PNG or JPG?", a: "JPG gives smaller files and suits photos and scans. PNG is lossless and keeps text and line art crisp, at a larger file size." },
+      { q: "Can I convert a PDF to JPG on my phone?", a: "Yes. It runs in mobile browsers, and multiple pages download together as a ZIP." },
     ],
     related: ["images-to-pdf", "split-pdf", "compress-image", "image-converter"],
   },
@@ -326,6 +340,7 @@ export const TOOLS: ToolConfig[] = [
       { q: "How do I sign a PDF without printing it?", a: "Drop the PDF here, draw your signature with a mouse, trackpad or finger, then drag it into place and download the signed file. No printer or scanner needed." },
       { q: "Can I sign more than one page?", a: "Yes. Place the signature on as many pages as you need before applying." },
       { q: "Is this a legally binding digital signature?", a: "It adds a visual signature image. It does not add a cryptographic certificate-based signature, so check what the recipient requires for formal contracts." },
+      { q: "Can I sign a PDF on my phone?", a: "Yes. Open Sign PDF in your phone's browser and draw your signature with your finger, then place it on the page." },
     ],
     related: ["add-page-numbers", "organize-pdf", "merge-pdf"],
   },
@@ -400,6 +415,9 @@ export const TOOLS: ToolConfig[] = [
       { q: "How do I compress an image to 100 KB?", a: "Set the maximum size to 100 KB and compress. The quality is lowered step by step until the file fits under the limit." },
       { q: "Will compression reduce image quality?", a: "Lossy formats trade a little detail for size, but at 75–85% quality the difference is hard to see. Use the before/after slider to check before you download." },
       { q: "Which format compresses best?", a: "WebP is usually 25–35% smaller than JPG at the same visual quality. PNG is best for graphics with flat colours." },
+      { q: "Can I compress an image to 50 KB or 20 KB?", a: "Yes. Set the target size anywhere from 20 KB to 10 MB. If an image can't reach a very small target, also lower its maximum width and height." },
+      { q: "Is it safe to compress passport and ID photos here?", a: "Yes. Images are compressed inside your browser and never uploaded, so nobody else can see your documents." },
+      { q: "Can I change the format while compressing?", a: "Yes. Keep the original format or save as JPG, PNG or WebP. JPG and WebP give much smaller files for photos." },
     ],
     related: ["resize-image", "image-converter", "crop-image", "images-to-pdf"],
   },
@@ -570,6 +588,8 @@ export const TOOLS: ToolConfig[] = [
       { q: "How do I cut part of a song?", a: "Drop the file, drag the start and end handles around the part you want (or type exact times), preview it and export." },
       { q: "Can I make a ringtone?", a: "Yes. Select up to 30 seconds, add a short fade and export as MP3." },
       { q: "Which formats can I cut?", a: "MP3, WAV, OGG, FLAC, AAC, M4A and other formats your browser can play. The result is saved as MP3 or WAV." },
+      { q: "Can I cut audio on my phone?", a: "Yes. Audio Cutter works in mobile browsers on Android and iPhone; drag the handles on the waveform with your finger." },
+      { q: "Does cutting reduce audio quality?", a: "Exporting as WAV adds no further compression. MP3 export is much smaller and sounds the same for most listening." },
     ],
     related: ["audio-joiner", "volume-booster", "reverse-audio"],
   },
@@ -692,6 +712,8 @@ export const TOOLS: ToolConfig[] = [
       { q: "How do I make a QR code for my Wi-Fi?", a: "Choose Wi-Fi, enter the network name, password and security type, and download the code. Phones that scan it can join without typing the password." },
       { q: "Can I scan a QR code from a screenshot?", a: "Yes. Switch to Scan and drop the image or screenshot; the code is decoded right in your browser." },
       { q: "Do these QR codes expire?", a: "No. They encode your content directly; there is no redirect service involved." },
+      { q: "What is the difference between static and dynamic QR codes?", a: "A static QR code stores your link or text inside the code itself, so it works for as long as that link works. A dynamic code points to a redirect on a company's server, which can stop working if the subscription ends. This generator makes static codes." },
+      { q: "Can I change where a QR code points after printing it?", a: "Not with a static code, because the link is part of the image. Point the code at a page you control, such as your own website, and change that page instead." },
     ],
     related: ["barcode-generator", "color-picker", "word-counter"],
   },
@@ -836,6 +858,7 @@ function conversion(spec: ConversionSpec): ToolConfig {
     related: ["image-converter", "compress-image", "resize-image"],
     variantOf: "image-converter",
     convertTo: MIME[spec.to],
+    formats: [spec.from, spec.to],
   };
 }
 
@@ -954,8 +977,140 @@ export const CONVERSIONS: ToolConfig[] = [
   }),
 ];
 
-/** Every /tools page: the tools themselves plus the conversion pages that reuse one of them. */
-export const TOOL_PAGES: ToolConfig[] = [...TOOLS, ...CONVERSIONS];
+// ─────────────────────── Target-size pages ───────────────────────
+// "Compress image to 100KB" style pages: the Compress Image workspace with its target size preset, and copy for the
+// forms and uploads that ask for that size. Like CONVERSIONS, they are not listed as separate tools.
+
+interface SizeSpec {
+  kb: number;
+  label: string;
+  description: string;
+  intro: string;
+  metaDescription: string;
+  extraKeywords: string[];
+  faqs: ToolFaq[];
+}
+
+function sizePage(spec: SizeSpec): ToolConfig {
+  const slug = `compress-image-to-${spec.label.toLowerCase().replace(" ", "")}`;
+  return {
+    slug,
+    title: `Compress Image to ${spec.label}`,
+    category: "image",
+    icon: ImageDown,
+    badges: ["Batch"],
+    description: spec.description,
+    intro: spec.intro,
+    seoTitle: `Compress Image to ${spec.label} – Free, No Upload`,
+    metaDescription: spec.metaDescription,
+    accept: IMAGES,
+    acceptLabel: IMAGE_LABEL,
+    maxSizeMB: 50,
+    multiple: true,
+    keywords: [
+      `compress image to ${spec.label.toLowerCase()}`,
+      `compress jpg to ${spec.label.toLowerCase()}`,
+      `reduce image size to ${spec.label.toLowerCase()}`,
+      `resize image to ${spec.label.toLowerCase()}`,
+      `photo size ${spec.label.toLowerCase()}`,
+      ...spec.extraKeywords,
+    ],
+    steps: [
+      "Add one or more JPG, PNG or WebP images.",
+      `The target is already set to ${spec.label}; change the format or dimensions if you need to.`,
+      `Compress and download images under ${spec.label}, one by one or as a ZIP.`,
+    ],
+    features: [`Target size preset to ${spec.label}`, "Before-and-after comparison", "Optional maximum width and height", "Batch compression with ZIP download"],
+    faqs: spec.faqs,
+    related: ["compress-image", "resize-image", "crop-image"],
+    variantOf: "compress-image",
+    targetKb: spec.kb,
+  };
+}
+
+export const SIZE_PAGES: ToolConfig[] = [
+  sizePage({
+    kb: 20,
+    label: "20 KB",
+    description: "Shrink signatures and small photos to under 20 KB.",
+    intro: "Many online application forms ask for a scanned signature or thumb impression under 20 KB. Compress your image to 20 KB in one step: the target size is already set, and the image is compressed on your device, never uploaded.",
+    metaDescription: "Compress an image or signature to 20 KB online for free. The target size is preset, so the result fits strict form limits. Your image is never uploaded.",
+    extraKeywords: ["signature size 20kb", "compress signature to 20kb"],
+    faqs: [
+      { q: "How do I get a signature under 20 KB?", a: "Crop the scan or photo tightly around the signature first, then compress it here. A small, tightly cropped image reaches 20 KB without becoming blurry." },
+      { q: "What if the image is still bigger than 20 KB?", a: "Turn on the maximum width and height option and lower it, for example to 400 pixels. Fewer pixels let the image reach 20 KB at a better quality." },
+      { q: "Which format should I choose?", a: "JPG is accepted almost everywhere and gets smallest for photos and scans. Keep the format the form asks for." },
+    ],
+  }),
+  sizePage({
+    kb: 50,
+    label: "50 KB",
+    description: "Compress passport-size photos to under 50 KB.",
+    intro: "Exam, job and admission forms often require a passport-size photo under 50 KB. The target is already set to 50 KB, so you can compress the photo in one step. It is processed on your device and never uploaded.",
+    metaDescription: "Compress a photo to 50 KB online for free, ideal for passport-size photos on exam and job forms. Batch compress with no upload: images stay on your device.",
+    extraKeywords: ["passport size photo 50kb", "compress photo for online form"],
+    faqs: [
+      { q: "How do I reduce a passport photo to 50 KB?", a: "Add the photo and press Compress. The tool keeps compressing until the file is under 50 KB. If the form also gives pixel dimensions, crop or resize to those first." },
+      { q: "Will the photo still look clear?", a: "At passport-photo dimensions, 50 KB is enough for a clear face. Use the before-and-after slider to check before downloading." },
+      { q: "Is it safe to compress ID and passport photos here?", a: "Yes. The photo is compressed inside your browser and never sent to a server, so nobody else sees it." },
+    ],
+  }),
+  sizePage({
+    kb: 100,
+    label: "100 KB",
+    description: "Compress photos to under 100 KB for forms and job portals.",
+    intro: "100 KB is one of the most common upload limits on job portals, visa and ID applications and online forms. Compress your image to 100 KB in one step, with a before-and-after preview. Images are processed on your device, never uploaded.",
+    metaDescription: "Compress an image to 100 KB online for free. Meet job portal, visa and form upload limits with a preset target size. No sign-up, and no upload to a server.",
+    extraKeywords: ["compress image to 100kb online", "image size reducer 100kb"],
+    faqs: [
+      { q: "How do I compress an image to 100 KB?", a: "Add the image and press Compress. The target is set to 100 KB, so the tool finds a quality that fits and shows the before-and-after result." },
+      { q: "Can I compress a 5 MB photo to 100 KB?", a: "Yes. Large phone photos usually need fewer pixels as well as stronger compression, so turn on the maximum width and height option, for example 1200 pixels, for a sharper result." },
+      { q: "Can I convert to JPG while compressing?", a: "Yes. Choose JPG, PNG or WebP as the output format. JPG or WebP reach 100 KB much more easily than PNG for photos." },
+    ],
+  }),
+  sizePage({
+    kb: 200,
+    label: "200 KB",
+    description: "Reduce images to under 200 KB for profiles and listings.",
+    intro: "Compress images to 200 KB for profile pictures, marketplace listings, documents and forms with a 200 KB limit. The target size is preset and the before-and-after slider shows the result. Images never leave your device.",
+    metaDescription: "Compress images to 200 KB online for free: profile photos, listings and forms with a 200 KB limit. Preset target size, batch support and no upload.",
+    extraKeywords: ["reduce photo size to 200kb", "compress jpeg to 200kb"],
+    faqs: [
+      { q: "How do I reduce an image to 200 KB?", a: "Add it and press Compress; the 200 KB target is already set. Download the result, or all images as a ZIP." },
+      { q: "Is 200 KB good quality?", a: "For most photos shown on screen, 200 KB at around 1600 pixels wide looks sharp. Compare it with the original using the slider before you download." },
+      { q: "Can I compress several photos to 200 KB at once?", a: "Yes. Add as many images as you need; each is compressed to the target and you can download them together." },
+    ],
+  }),
+  sizePage({
+    kb: 500,
+    label: "500 KB",
+    description: "Compress photos to under 500 KB for websites and email.",
+    intro: "500 KB keeps photos sharp while making them light enough for websites, blogs, online stores and email. Compress images to 500 KB with a preset target and compare the result before downloading. Nothing is uploaded.",
+    metaDescription: "Compress images to 500 KB online for free. Keep photos sharp but light for websites, blogs and email. Preset target size, batch support and no upload.",
+    extraKeywords: ["compress image for website", "reduce image size for email"],
+    faqs: [
+      { q: "Why compress website images to 500 KB or less?", a: "Smaller images make pages load faster, especially on phones. For extra savings on a website, choose WebP as the output format." },
+      { q: "Will 500 KB reduce quality?", a: "Usually very little. Most photos can be compressed to 500 KB with no visible difference at normal viewing size." },
+      { q: "Should I resize as well?", a: "If the photo is wider than about 2000 pixels, set a maximum width too. It keeps the photo sharper at the same file size." },
+    ],
+  }),
+  sizePage({
+    kb: 1024,
+    label: "1 MB",
+    description: "Get photos under 1 MB for uploads and attachments.",
+    intro: "Many upload forms and apps cap images at 1 MB. Compress large photos to under 1 MB with almost no visible change, one at a time or in a batch. Compression runs in your browser, so photos stay on your device.",
+    metaDescription: "Compress images to under 1 MB online for free with almost no visible quality loss. Fix 'file too large' upload errors. Batch support, no upload.",
+    extraKeywords: ["compress image under 1mb", "reduce photo size to 1mb"],
+    faqs: [
+      { q: "How do I make a photo smaller than 1 MB?", a: "Add it and press Compress; the 1 MB target is preset. Phone photos of 3–6 MB usually fit under 1 MB with no visible difference." },
+      { q: "Why does a site say my file is too large?", a: "Many sites limit uploads to 1 MB or less to save storage and bandwidth. Compressing the photo to the limit fixes the error without changing what it shows." },
+      { q: "Can I keep PNG format?", a: "Yes, but PNG photos compress far less than JPG or WebP. For photos, switching to JPG makes the 1 MB target easy to reach." },
+    ],
+  }),
+];
+
+/** Every /tools page: the tools themselves plus the conversion and target-size pages that reuse one of them. */
+export const TOOL_PAGES: ToolConfig[] = [...TOOLS, ...CONVERSIONS, ...SIZE_PAGES];
 
 export const TOOL_MAP: Record<string, ToolConfig> = Object.fromEntries(TOOL_PAGES.map((t) => [t.slug, t]));
 

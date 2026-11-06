@@ -268,13 +268,128 @@ export const GUIDES: GuideConfig[] = [
       },
     ],
   },
+  {
+    slug: "do-qr-codes-expire",
+    title: "Do QR Codes Expire? Static vs Dynamic Codes",
+    description: "Why some QR codes stop working, the difference between static and dynamic QR codes, and how to make a free QR code that never expires. Plain-English guide.",
+    answer: "A static QR code never expires: the link or text is stored inside the code itself, so it works as long as that link does. Dynamic QR codes point to a redirect on a company's server and can stop working when a trial or subscription ends. The [QR Code Generator](/tools/qr-code) here makes static codes.",
+    published: "2026-11-06",
+    updated: "2026-11-06",
+    tools: ["qr-code", "barcode-generator"],
+    sections: [
+      {
+        heading: "Static vs dynamic QR codes",
+        list: [
+          "Static: the data, such as your website address, Wi-Fi details or text, is encoded directly in the black-and-white pattern. No server is involved, so there is nothing to expire or switch off.",
+          "Dynamic: the code contains a short link to the provider's server, which forwards people to your real address. That lets you change the destination later and count scans, but it only works while the provider keeps the redirect running.",
+        ],
+      },
+      {
+        heading: "Why QR codes stop working",
+        paragraphs: [
+          "When a printed QR code suddenly fails, it is usually a dynamic code whose free trial or paid plan has ended, so the provider's redirect no longer forwards to your page. The code on your menus, flyers or packaging is still readable; it just leads nowhere useful.",
+          "A static code can only stop working if the thing it points to changes, for example if the web page is deleted or the Wi-Fi password is changed.",
+        ],
+      },
+      {
+        heading: "Make a QR code that never expires",
+        ordered: true,
+        list: [
+          "Open the [QR Code Generator](/tools/qr-code) and choose the type: link, text, Wi-Fi, email or phone.",
+          "Enter the details and adjust the colours, margin and error correction if you like.",
+          "Download it as PNG for documents or SVG for print, and scan it with your phone to test before printing.",
+        ],
+      },
+      {
+        heading: "How to keep the option to change it later",
+        paragraphs: [
+          "If you may need to change the destination after printing, point the static code at a page you control, such as a page on your own website, and update that page instead. You get the flexibility of a dynamic code without depending on a QR provider.",
+          "For products and stock labels rather than links, a [barcode](/tools/barcode-generator) may be the better fit.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "how-to-compress-image-to-100kb",
+    title: "How to Compress an Image to 100 KB for Forms",
+    description: "Get a photo, passport picture or signature under 100 KB, 50 KB or 20 KB for job portals and online forms: crop, resize, then compress. Free and without uploading.",
+    answer: "To get an image under 100 KB, open [Compress Image to 100 KB](/tools/compress-image-to-100kb), add the photo and press Compress. If the result is still too big or blurry, crop it to the required shape and lower its pixel size first; fewer pixels reach small sizes with better quality.",
+    published: "2026-11-06",
+    updated: "2026-11-06",
+    tools: ["compress-image-to-100kb", "crop-image", "resize-image"],
+    sections: [
+      {
+        heading: "Check what the form asks for",
+        paragraphs: [
+          "Application forms usually set two limits: a maximum file size, such as 20 KB, 50 KB or 100 KB, and sometimes exact pixel dimensions or a format such as JPG. Note both before you start, because meeting the pixel size first makes the file size much easier to reach.",
+        ],
+      },
+      {
+        heading: "Compress the image step by step",
+        ordered: true,
+        list: [
+          "Crop the photo to the shape the form wants, for example a passport-style portrait, with [Crop Image](/tools/crop-image).",
+          "If dimensions are given, set them with [Resize Image](/tools/resize-image). A 5 MB phone photo rarely needs to be wider than 1200 pixels.",
+          "Open the page for your limit, such as [100 KB](/tools/compress-image-to-100kb), [50 KB](/tools/compress-image-to-50kb) or [20 KB](/tools/compress-image-to-20kb), and press Compress.",
+          "Check the before-and-after slider, then download the image and upload it to the form.",
+        ],
+      },
+      {
+        heading: "If the image won't get small enough",
+        list: [
+          "Lower the maximum width and height on the compressor; this is the biggest saving.",
+          "Save as JPG instead of PNG. PNG photos are much larger and rarely reach 50 KB.",
+          "For signatures, crop tightly around the ink so there is little empty paper left.",
+        ],
+      },
+      {
+        heading: "Keeping ID photos private",
+        paragraphs: [
+          "Passport photos, signatures and ID scans are exactly the files you shouldn't upload to unknown websites. These tools compress images inside your browser, so the files stay on your device. Read more in [are online tools safe?](/guides/are-online-pdf-tools-safe)",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "how-to-combine-pdf-and-jpg",
+    title: "How to Combine PDF and JPG Files Into One PDF",
+    description: "Put PDFs and photos or scans into a single PDF in the right order: convert the images, merge everything, then shrink the file if needed. Free and without uploading.",
+    answer: "To combine PDF and JPG files, first turn the images into a PDF with [Images to PDF](/tools/images-to-pdf), then add that file and your other PDFs to [Merge PDF](/tools/merge-pdf) and put them in order. If the result is too large to send, shrink it with [Compress PDF](/tools/compress-pdf).",
+    published: "2026-11-06",
+    updated: "2026-11-06",
+    tools: ["images-to-pdf", "merge-pdf", "compress-pdf"],
+    sections: [
+      {
+        heading: "Combine images and PDFs step by step",
+        ordered: true,
+        list: [
+          "Open [Images to PDF](/tools/images-to-pdf) and add your JPG or PNG photos, such as receipts or scanned pages. Choose A4 or Letter if the result will be printed.",
+          "Download the new PDF.",
+          "Open [Merge PDF](/tools/merge-pdf), add that PDF together with your other PDF files, and drag them into the order you want.",
+          "Merge and download a single PDF containing everything.",
+        ],
+      },
+      {
+        heading: "Fix the order or remove pages",
+        paragraphs: [
+          "If a page ends up in the wrong place, or a blank page sneaks in, open the merged file in [Organize PDF](/tools/organize-pdf) to drag pages around or delete them. Sideways photos can be fixed with [Rotate PDF](/tools/rotate-pdf).",
+        ],
+      },
+      {
+        heading: "Keep the file small enough to send",
+        paragraphs: [
+          "Photos from a phone make large pages. If the combined PDF is over an email or upload limit, run it through [Compress PDF](/tools/compress-pdf), or compress the photos with [Compress Image](/tools/compress-image) before converting them.",
+        ],
+      },
+    ],
+  },
 ];
 
 export function getGuide(slug: string): GuideConfig | undefined {
   return GUIDES.find((g) => g.slug === slug);
 }
 
-/** Guides that use a tool, for the "Guides" list on its page. */
-export function guidesForTool(slug: string): GuideConfig[] {
-  return GUIDES.filter((g) => g.tools.includes(slug));
+/** Guides that use any of these tools, for the "Guides" list on a tool page. */
+export function guidesForTool(...slugs: string[]): GuideConfig[] {
+  return GUIDES.filter((g) => g.tools.some((t) => slugs.includes(t)));
 }

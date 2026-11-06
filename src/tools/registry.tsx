@@ -3,13 +3,14 @@
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import { ToolSkeleton } from "@/components/tool/ToolSkeleton";
-import { CONVERSIONS } from "@/config/tools.config";
+import { CONVERSIONS, SIZE_PAGES } from "@/config/tools.config";
 
 /** Loading placeholder; pass a height for workspaces much taller than the default one. */
 const sized = (minHeight?: string) => function SizedSkeleton() {
   return <ToolSkeleton minHeight={minHeight} />;
 };
 
+const CompressImage = dynamic(() => import("./image/CompressImage"), { ssr: false, loading: sized() });
 const ImageConverter = dynamic(() => import("./image/ImageConverter"), { ssr: false, loading: sized() });
 
 /** Every tool workspace is code-split and only loaded in the browser. */
@@ -25,7 +26,13 @@ export const TOOL_COMPONENTS: Record<string, ComponentType> = {
   "rotate-pdf": dynamic(() => import("./document/RotatePdf"), { ssr: false, loading: sized() }),
   "add-page-numbers": dynamic(() => import("./document/AddPageNumbers"), { ssr: false, loading: sized() }),
   // image
-  "compress-image": dynamic(() => import("./image/CompressImage"), { ssr: false, loading: sized() }),
+  "compress-image": CompressImage,
+  // Target-size pages (compress-image-to-100kb, …) mount the compressor with their own slug and size.
+  ...Object.fromEntries(
+    SIZE_PAGES.map((p) => [p.slug, function SizeTool() {
+      return <CompressImage slug={p.slug} initialTargetKb={p.targetKb} />;
+    }]),
+  ),
   "resize-image": dynamic(() => import("./image/ResizeImage"), { ssr: false, loading: sized() }),
   "image-converter": ImageConverter,
   // Conversion pages (png-to-jpg, …) mount the converter with their own slug and target format.

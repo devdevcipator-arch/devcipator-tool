@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
-import { CATEGORIES, CONVERSIONS, getCategory, toolsInCategory } from "@/config/tools.config";
+import { CATEGORIES, CONVERSIONS, SIZE_PAGES, getCategory, toolsInCategory } from "@/config/tools.config";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { cn } from "@/lib/cn";
 import { ToolCard } from "@/components/home/ToolCard";
@@ -82,6 +82,16 @@ export default async function CategoryPage({ params }: PageProps<"/category/[cat
               <li key={c.slug}>
                 <Link href={`/tools/${c.slug}`} className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:text-fg pointer-coarse:min-h-11">
                   {c.title.replace(" Converter", "")}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <h2 id="sizes" className="mt-10 text-2xl font-semibold tracking-tight text-fg">Compress images to a specific size</h2>
+          <ul className="mt-5 flex flex-wrap gap-2">
+            {SIZE_PAGES.map((p) => (
+              <li key={p.slug}>
+                <Link href={`/tools/${p.slug}`} className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:text-fg pointer-coarse:min-h-11">
+                  {p.title.replace("Compress Image to ", "Under ")}
                 </Link>
               </li>
             ))}

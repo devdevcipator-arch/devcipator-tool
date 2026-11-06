@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, CircleCheck, ShieldCheck } from "lucide-react";
-import { CONVERSIONS, SITE, TOOLS, TOOL_PAGES, getCategory, getTool, relatedTools, toolFaqs } from "@/config/tools.config";
+import { CONVERSIONS, SIZE_PAGES, SITE, TOOLS, TOOL_PAGES, getCategory, getTool, relatedTools, toolFaqs } from "@/config/tools.config";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/ui/Badge";
@@ -11,7 +11,7 @@ import { ToolLoader } from "@/components/tool/ToolLoader";
 import { ToolCard } from "@/components/home/ToolCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { guidesForTool } from "@/config/guides";
-import { TOOL_DETAILS } from "@/config/tool-content";
+import { FORMAT_INFO, TOOL_DETAILS } from "@/config/tool-content";
 import { RichText } from "@/components/layout/RichText";
 import { ORGANIZATION_ID, WEBSITE_ID, absoluteUrl, breadcrumbList, pageMetadata } from "@/lib/seo";
 
@@ -41,8 +41,10 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
   const faqs = toolFaqs(tool);
   // The converter and its conversion pages link to each other.
   const conversions = tool.slug === "image-converter" || tool.variantOf === "image-converter" ? CONVERSIONS.filter((c) => c.slug !== tool.slug) : [];
+  const sizes = tool.slug === "compress-image" || tool.variantOf === "compress-image" ? SIZE_PAGES.filter((p) => p.slug !== tool.slug) : [];
+  const formats = (tool.formats ?? []).filter((f) => FORMAT_INFO[f]);
   const updated = new Date(SITE.updated.content);
-  const guides = guidesForTool(tool.variantOf ?? tool.slug);
+  const guides = guidesForTool(tool.slug, ...(tool.variantOf ? [tool.variantOf] : []));
   const details = TOOL_DETAILS[tool.slug];
   const url = absoluteUrl(`/tools/${tool.slug}`);
 
@@ -160,6 +162,35 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
                   <p key={p}><RichText text={p} /></p>
                 ))}
               </div>
+            </section>
+          )}
+
+          {formats.map((f) => (
+            <section key={f} aria-labelledby={`what-is-${f.toLowerCase()}`}>
+              <h2 id={`what-is-${f.toLowerCase()}`} className="text-2xl font-semibold tracking-tight text-fg">What is {f === "AVIF" || f === "SVG" ? "an" : "a"} {f} file?</h2>
+              <p className="mt-4 max-w-3xl text-base leading-relaxed text-fg-muted">{FORMAT_INFO[f]}</p>
+            </section>
+          ))}
+
+          {sizes.length > 0 && (
+            <section aria-labelledby="sizes">
+              <h2 id="sizes" className="text-2xl font-semibold tracking-tight text-fg">Compress to a specific size</h2>
+              <ul className="mt-5 flex flex-wrap gap-2">
+                {tool.variantOf && (
+                  <li>
+                    <Link href="/tools/compress-image" className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg hover:border-border-strong pointer-coarse:min-h-11">
+                      Any size
+                    </Link>
+                  </li>
+                )}
+                {sizes.map((p) => (
+                  <li key={p.slug}>
+                    <Link href={`/tools/${p.slug}`} className="inline-flex items-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-fg-muted hover:text-fg pointer-coarse:min-h-11">
+                      {p.title.replace("Compress Image to ", "Under ")}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </section>
           )}
 

@@ -9,6 +9,15 @@ export interface ToolDetails {
   paragraphs: string[];
 }
 
+/** "What is a … file?" explainers shown on the conversion pages, keyed by the names used in ToolConfig.formats. */
+export const FORMAT_INFO: Record<string, string> = {
+  JPG: "JPG (or JPEG) is the most common format for photos. It uses lossy compression, discarding detail the eye barely notices, so photos become small files that open in every app, browser and phone. It has no transparency, and repeated editing and re-saving gradually lowers quality, so it suits finished photos rather than graphics with sharp text.",
+  PNG: "PNG is a lossless image format: it stores every pixel exactly, so text, logos, screenshots and line art stay crisp. It supports transparent backgrounds, which makes it the usual choice for logos and icons. The trade-off is size: photos saved as PNG are often several times larger than the same photo as JPG.",
+  WebP: "WebP is a modern image format developed by Google for the web. It supports both lossy and lossless compression as well as transparency, and its files are usually noticeably smaller than JPG or PNG at similar quality. All current browsers display WebP, but some older desktop apps and upload forms still don't accept it.",
+  SVG: "SVG is a vector format: instead of pixels, it describes shapes, lines and text with code, so it stays perfectly sharp at any size. It is ideal for logos, icons and illustrations on websites, but many documents, slide tools and apps can't insert SVG files, which is when a PNG copy is needed.",
+  AVIF: "AVIF is a newer image format based on the AV1 video codec. It compresses photos even more efficiently than WebP and supports transparency and high dynamic range, so more and more websites use it. Support outside browsers is still limited, which is why AVIF images often need converting before you can edit or upload them.",
+};
+
 export const TOOL_DETAILS: Record<string, ToolDetails> = {
   // ───────────────────────────── PDF ─────────────────────────────
   "merge-pdf": {
