@@ -22,9 +22,11 @@ export interface ProcessorState {
   results: OutputFile[];
   error: string | null;
   message: string | null;
+  /** Shown as a warning beside the results, e.g. when a file could not reach its target size. */
+  warning: string | null;
 }
 
-export type ProcessResult = OutputFile[] | { files: OutputFile[]; message?: string };
+export type ProcessResult = OutputFile[] | { files: OutputFile[]; message?: string; warning?: string };
 
 /**
  * Runs an async job with progress reporting, cancellation and result/error state.
@@ -37,6 +39,7 @@ export function useProcessor() {
     results: [],
     error: null,
     message: null,
+    warning: null,
   });
   const abortRef = useRef<AbortController | null>(null);
 
@@ -46,7 +49,7 @@ export function useProcessor() {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
-    setState({ status: "running", progress: { value: null, label: "Starting…" }, results: [], error: null, message: null });
+    setState({ status: "running", progress: { value: null, label: "Starting…" }, results: [], error: null, message: null, warning: null });
 
     const report = (value: number | null, label?: string) => {
       if (controller.signal.aborted) return;
@@ -58,7 +61,8 @@ export function useProcessor() {
       if (controller.signal.aborted) return;
       const files = Array.isArray(out) ? out : out.files;
       const message = Array.isArray(out) ? null : (out.message ?? null);
-      setState({ status: "done", progress: { value: 1, label: "Done" }, results: files, error: null, message });
+      const warning = Array.isArray(out) ? null : (out.warning ?? null);
+      setState({ status: "done", progress: { value: 1, label: "Done" }, results: files, error: null, message, warning });
     } catch (err) {
       if (controller.signal.aborted) return;
       console.error(err);
@@ -73,7 +77,7 @@ export function useProcessor() {
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
-    setState({ status: "idle", progress: { value: null, label: "" }, results: [], error: null, message: null });
+    setState({ status: "idle", progress: { value: null, label: "" }, results: [], error: null, message: null, warning: null });
   }, []);
 
   return { ...state, run, cancel, reset };

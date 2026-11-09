@@ -7,10 +7,11 @@ import { useProcessor, throwIfAborted } from "@/hooks/useProcessor";
 import { useObjectUrl } from "@/hooks/useObjectUrl";
 import { compressToTarget, useImageCompressor, type CompressSettings } from "@/hooks/useImageCompressor";
 import { formatBytes, withExtension, type OutputFile } from "@/lib/files";
+import { heicAsJpeg, isHeicFile } from "@/lib/image/heic";
 import { Panel, ToolLayout } from "@/components/tool/ToolLayout";
 import { ImageGrid } from "@/components/image/ImageGrid";
 import { BeforeAfter } from "@/components/image/BeforeAfter";
-import { TargetSizePicker, formatKb } from "@/components/tool/TargetSizePicker";
+import { TargetSizePicker, formatKb, targetBytes } from "@/components/tool/TargetSizePicker";
 import { Field, Notice, NumberInput, Select, Slider, Toggle } from "@/components/ui/controls";
 
 type FormatChoice = "same" | "image/jpeg" | "image/png" | "image/webp";
@@ -36,7 +37,7 @@ export default function CompressImage({ slug = "compress-image", initialTargetKb
     return {
       fileType: format === "same" ? same : format,
       quality: quality / 100,
-      maxSizeMB: limitSize ? targetKb / 1024 : undefined,
+      maxSizeMB: limitSize ? targetBytes(targetKb) / (1024 * 1024) : undefined,
       maxWidthOrHeight: limitDim && maxDim > 0 ? maxDim : undefined,
     };
   };
@@ -58,30 +59,52 @@ export default function CompressImage({ slug = "compress-image", initialTargetKb
         throwIfAborted(signal);
         const file = items[i].file;
         const settings = settingsFor(file);
+        before += file.size;
+        // A file that already fits, in the format asked for, is returned untouched rather than re-compressed.
+        if (limitSize && file.size <= targetBytes(targetKb) && settings.fileType === file.type && !settings.maxWidthOrHeight) {
+          after += file.size;
+          out.push({ name: file.name, blob: file, note: `Already under ${formatKb(targetKb)}` });
+          continue;
+        }
         const { file: result, scaledTo } = await compressToTarget(file, settings, signal, (p) => report((i + p / 100) / items.length, `Compressing ${file.name}`));
         if (scaledTo) scaled++;
         // Never hand back something bigger than the original in the same format.
         const keepOriginal = result.size >= file.size && settings.fileType === file.type && !settings.maxWidthOrHeight && !scaledTo;
         const blob = keepOriginal ? file : result;
-        before += file.size;
         after += blob.size;
         const saved = Math.round((1 - blob.size / file.size) * 100);
         out.push({
           name: withExtension(file.name, EXT[settings.fileType], keepOriginal ? "" : "-compressed"),
           blob,
-          note: (keepOriginal ? "Already optimal" : saved >= 0 ? `−${saved}%` : `+${-saved}%`) + (scaledTo ? ` · max ${scaledTo}px` : ""),
+          note: (keepOriginal ? "Already optimal" : saved >= 0 ? `−${saved}%` : `+${-saved}%`) + (scaledTo ? ` · ${scaledTo}px longest side` : ""),
         });
       }
-      const missed = limitSize ? out.filter((o) => o.blob.size > targetKb * 1024).length : 0;
+      const missed = limitSize ? out.filter((o) => o.blob.size > targetBytes(targetKb)).length : 0;
       return {
         files: out,
         message:
           `${formatBytes(before)} → ${formatBytes(after)} (−${Math.max(0, Math.round((1 - after / before) * 100))}% total).` +
-          (scaled ? ` ${scaled} image${scaled === 1 ? " was" : "s were"} also scaled down to reach ${formatKb(targetKb)}.` : "") +
-          (missed ? ` ${missed} image${missed === 1 ? "" : "s"} could not reach ${formatKb(targetKb)} — try lowering the dimensions.` : ""),
+          (scaled ? ` ${scaled} image${scaled === 1 ? " was" : "s were"} also scaled down to reach ${formatKb(targetKb)}.` : ""),
+        warning: missed
+          ? `${missed} image${missed === 1 ? "" : "s"} could not reach ${formatKb(targetKb)}. Choose JPG or WebP output, or turn on Limit dimensions and lower it.`
+          : undefined,
       };
     });
   }
+
+  // iPhone HEIC photos are turned into JPGs as they are added, so the preview and the compressor can read them.
+  const [converting, setConverting] = useState(false);
+  async function addFiles(files: File[]) {
+    if (!files.some(isHeicFile)) return list.add(files);
+    setConverting(true);
+    try {
+      const ready = await Promise.all(files.map((f) => (isHeicFile(f) ? heicAsJpeg(f).catch(() => null) : f)));
+      list.add(ready.filter((f): f is File => f !== null));
+    } finally {
+      setConverting(false);
+    }
+  }
+  const pngOut = limitSize && list.items.some((i) => settingsFor(i.file).fileType === "image/png");
 
   const delta = preview.result && selected ? Math.round((1 - preview.result.size / selected.file.size) * 100) : null;
 
@@ -89,7 +112,8 @@ export default function CompressImage({ slug = "compress-image", initialTargetKb
     <ToolLayout
       slug={slug}
       fileCount={list.items.length}
-      onFiles={list.add}
+      onFiles={addFiles}
+      dropLabel={converting ? "Converting iPhone photos to JPG…" : undefined}
       onReset={list.clear}
       processor={processor}
       zipName="compressed-images.zip"
@@ -98,6 +122,11 @@ export default function CompressImage({ slug = "compress-image", initialTargetKb
         <>
           <Toggle label="Limit file size" hint="Quality is lowered automatically until each image fits." checked={limitSize} onChange={setLimitSize} />
           {limitSize && <TargetSizePicker value={targetKb} onChange={setTargetKb} />}
+          {pngOut && (
+            <Notice tone="info">
+              PNG can&apos;t lower its quality, so reaching a size means shrinking the picture, which is slow and makes it small. For photos, set Output format to JPG or WebP.
+            </Notice>
+          )}
           <Slider
             label={limitSize ? "Starting quality" : "Quality"}
             value={quality}

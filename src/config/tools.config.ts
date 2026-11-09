@@ -162,7 +162,7 @@ export const CATEGORIES: CategoryConfig[] = [
 const PDF = ["application/pdf", ".pdf"];
 const IMAGES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp", "image/avif", ".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".avif"];
 const AUDIO = ["audio/*", ".mp3", ".wav", ".ogg", ".oga", ".flac", ".aac", ".m4a", ".opus", ".webm"];
-/** iPhone photos. Only the Image Converter and its conversion pages decode these (see lib/image/heic.ts). */
+/** iPhone photos, decoded by lib/image/heic.ts (Image Converter, File Compressor and Compress Image). */
 const HEIC = ["image/heic", "image/heif", ".heic", ".heif"];
 const IMAGE_LABEL = "JPG, PNG, WebP, GIF, BMP, AVIF";
 const AUDIO_LABEL = "MP3, WAV, OGG, FLAC, AAC, M4A";
@@ -437,12 +437,12 @@ export const TOOLS: ToolConfig[] = [
     intro: "Reduce any photo from several MB down to 100 KB, 50 KB or even 20 KB for online forms, job portals and email. Pick a target size, compare before and after, and download. Images are compressed on your device and never uploaded.",
     seoTitle: "Compress Image to 100KB, 50KB or 20KB",
     metaDescription: "Compress JPG, PNG and WebP images to 100 KB, 50 KB, 20 KB or any size in KB. Free batch compression with a before/after preview, and no upload.",
-    accept: IMAGES,
-    acceptLabel: IMAGE_LABEL,
+    accept: [...IMAGES, ...HEIC],
+    acceptLabel: `${IMAGE_LABEL}, HEIC`,
     maxSizeMB: 50,
     multiple: true,
     keywords: ["compress image", "image compressor", "compress image to 100kb", "compress image to 50kb", "compress image to 20kb", "compress image in kb", "reduce image size in kb", "compress jpg", "compress png", "reduce photo file size", "compress jpg online without losing quality"],
-    steps: ["Add one or more JPG, PNG or WebP images.", "Pick a target size such as 100 KB, or type an exact size in KB.", "Compare before and after, then download the smaller images."],
+    steps: ["Add one or more images: JPG, PNG, WebP, GIF, BMP, AVIF or iPhone HEIC.", "Pick a target size such as 100 KB, or type an exact size in KB.", "Compare before and after, then download the smaller images."],
     features: ["Target size presets from 20 KB to 1 MB, or any KB", "Reaches the target even from multi-MB photos", "Draggable before/after comparison", "Batch compression with ZIP download"],
     faqs: [
       { q: "How do I compress an image to 100 KB?", a: "Pick 100 KB as the target size and press Compress. Quality is lowered step by step, and very large photos are also scaled down, until the file fits under 100 KB." },
@@ -1051,8 +1051,8 @@ function sizePage(spec: SizeSpec): ToolConfig {
     intro: spec.intro,
     seoTitle: `Compress Image to ${spec.label} – Free, No Upload`,
     metaDescription: spec.metaDescription,
-    accept: IMAGES,
-    acceptLabel: IMAGE_LABEL,
+    accept: [...IMAGES, ...HEIC],
+    acceptLabel: `${IMAGE_LABEL}, HEIC`,
     maxSizeMB: 50,
     multiple: true,
     keywords: [
@@ -1064,7 +1064,7 @@ function sizePage(spec: SizeSpec): ToolConfig {
       ...spec.extraKeywords,
     ],
     steps: [
-      "Add one or more JPG, PNG or WebP images.",
+      "Add one or more images: JPG, PNG, WebP, GIF, BMP, AVIF or iPhone HEIC.",
       `The target is already set to ${spec.label}; change the format or dimensions if you need to.`,
       `Compress and download images under ${spec.label}, one by one or as a ZIP.`,
     ],
@@ -1086,7 +1086,7 @@ export const SIZE_PAGES: ToolConfig[] = [
     extraKeywords: ["signature size 20kb", "compress signature to 20kb"],
     faqs: [
       { q: "How do I get a signature under 20 KB?", a: "Crop the scan or photo tightly around the signature first, then compress it here. A small, tightly cropped image reaches 20 KB without becoming blurry." },
-      { q: "What if the image is still bigger than 20 KB?", a: "Turn on the maximum width and height option and lower it, for example to 400 pixels. Fewer pixels let the image reach 20 KB at a better quality." },
+      { q: "What if the image is still bigger than 20 KB?", a: "It is scaled down automatically until it fits, and the result shows its new size. For a sharper result, crop tightly first, or turn on Limit dimensions and pick a size such as 400 pixels yourself." },
       { q: "Which format should I choose?", a: "JPG is accepted almost everywhere and gets smallest for photos and scans. Keep the format the form asks for." },
     ],
   }),
@@ -1112,7 +1112,7 @@ export const SIZE_PAGES: ToolConfig[] = [
     extraKeywords: ["compress image to 100kb online", "image size reducer 100kb"],
     faqs: [
       { q: "How do I compress an image to 100 KB?", a: "Add the image and press Compress. The target is set to 100 KB, so the tool finds a quality that fits and shows the before-and-after result." },
-      { q: "Can I compress a 5 MB photo to 100 KB?", a: "Yes. Large phone photos usually need fewer pixels as well as stronger compression, so turn on the maximum width and height option, for example 1200 pixels, for a sharper result." },
+      { q: "Can I compress a 5 MB photo to 100 KB?", a: "Yes. When lowering the quality is not enough, the photo is also scaled down automatically until it fits under 100 KB, and the result shows its new size. A typical phone photo ends up around 1,500 pixels wide." },
       { q: "Can I convert to JPG while compressing?", a: "Yes. Choose JPG, PNG or WebP as the output format. JPG or WebP reach 100 KB much more easily than PNG for photos." },
     ],
   }),

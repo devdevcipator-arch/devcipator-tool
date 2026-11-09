@@ -61,7 +61,11 @@ export async function compressToTarget(
     out = await compressImage(file, { ...s, maxWidthOrHeight: side }, signal);
     factor = 0.8;
   }
-  return { file: out, scaledTo: side };
+  // The library shrinks further on its own while it searches for the size, so report what the output really is.
+  const result = await createImageBitmap(out);
+  const scaledTo = Math.max(result.width, result.height);
+  result.close();
+  return { file: out, scaledTo };
 }
 
 /** Debounced live compression of one image for the before/after preview. */

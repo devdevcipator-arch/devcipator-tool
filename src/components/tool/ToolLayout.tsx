@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { RotateCcw, Square } from "lucide-react";
 import { getTool } from "@/config/tools.config";
 import type { Processor } from "@/hooks/useProcessor";
@@ -65,6 +65,14 @@ export function ToolLayout({
     setStale(seen.results === processor.results && processor.status === "done");
   }
   const markStale = () => processor.status === "done" && setStale(true);
+  // Results appear below the settings, often off-screen: bring them into view once each run finishes.
+  const resultRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = resultRef.current;
+    if (!el) return;
+    const { top, bottom } = el.getBoundingClientRect();
+    if (top < 0 || bottom > window.innerHeight) el.scrollIntoView({ block: top < 0 ? "start" : "nearest" });
+  }, [processor.results]);
   const tool = getTool(slug);
   if (!tool) throw new Error(`Unknown tool: ${slug}`);
   const running = processor.status === "running";
@@ -121,7 +129,16 @@ export function ToolLayout({
               </>
             ) : (
               <>
-                <Button size="lg" className="w-full" icon={action.icon} onClick={action.onClick} disabled={action.disabled}>
+                <Button
+                  size="lg"
+                  className="w-full"
+                  icon={action.icon}
+                  onClick={() => {
+                    setRejected([]);
+                    action.onClick();
+                  }}
+                  disabled={action.disabled}
+                >
                   {action.label}
                 </Button>
                 {action.disabled && action.hint && <p className="text-center text-xs text-fg-subtle">{action.hint}</p>}
@@ -132,10 +149,13 @@ export function ToolLayout({
           {processor.status === "error" && processor.error && <Notice tone="danger">{processor.error}</Notice>}
         </div>
 
-        {processor.status === "done" && stale && (
-          <Notice tone="warning">These files were made with earlier settings. Click “{action.label}” again to update them.</Notice>
+        {processor.status === "done" && (
+          <div ref={resultRef} className="flex scroll-mt-24 flex-col gap-4">
+            {stale && <Notice tone="warning">These files were made with earlier settings. Click “{action.label}” again to update them.</Notice>}
+            {processor.warning && <Notice tone="warning">{processor.warning}</Notice>}
+            <ResultList results={processor.results} zipName={zipName ?? `${slug}.zip`} message={processor.message} />
+          </div>
         )}
-        {processor.status === "done" && <ResultList results={processor.results} zipName={zipName ?? `${slug}.zip`} message={processor.message} />}
       </aside>
     </div>
   );

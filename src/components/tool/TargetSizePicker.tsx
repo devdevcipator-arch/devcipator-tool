@@ -10,6 +10,12 @@ export const POPULAR_KB = 100;
 
 export const formatKb = (kb: number) => (kb >= 1024 ? `${+(kb / 1024).toFixed(1)} MB` : `${kb} KB`);
 
+/**
+ * The byte limit a target is checked against. Portals and macOS count 1 KB as 1,000 bytes and 1 MB as 1,000,000,
+ * so aiming there keeps results under the limit however the site measures it (1,024-based counting is looser).
+ */
+export const targetBytes = (kb: number) => (kb >= 1024 ? Math.round((kb / 1024) * 1_000_000) : kb * 1000);
+
 /** Preset target sizes as a chip grid plus an exact KB input, styled like Segmented. */
 export function TargetSizePicker({ value, onChange, min = 5, max = 51200 }: { value: number; onChange: (kb: number) => void; min?: number; max?: number }) {
   // The box keeps what is typed (e.g. the "1" on the way to "100"); only values in range reach the parent.
@@ -19,6 +25,7 @@ export function TargetSizePicker({ value, onChange, min = 5, max = 51200 }: { va
     setSynced(value);
     setDraft(value);
   }
+  const invalid = !Number.isFinite(draft) || draft < min || draft > max;
   return (
     <Field label="Target size" hint="Each file is made smaller than this. 100 KB is the most common limit on online forms.">
       <div role="radiogroup" aria-label="Target size" className="grid grid-cols-3 gap-1 rounded-lg border border-border bg-surface-2 p-0.5">
@@ -58,6 +65,11 @@ export function TargetSizePicker({ value, onChange, min = 5, max = 51200 }: { va
           className="flex-1"
         />
       </div>
+      {invalid && (
+        <p role="alert" className="mt-1 text-xs font-medium text-danger">
+          Enter a size from {formatKb(min)} to {formatKb(max)}. Still using {formatKb(value)}.
+        </p>
+      )}
     </Field>
   );
 }

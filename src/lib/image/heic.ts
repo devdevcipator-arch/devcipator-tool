@@ -15,3 +15,10 @@ export async function decodeHeic(file: File): Promise<ImageBitmap> {
   const { heicTo } = await import("heic-to/next");
   return heicTo({ blob: file, type: "bitmap" });
 }
+
+/** Turns an iPhone HEIC photo into a high-quality JPEG that every compressor and form can read. */
+export async function heicAsJpeg(file: File): Promise<File> {
+  const { transformBitmap } = await import("./client");
+  const { blob } = await transformBitmap(await decodeHeic(file), { format: "image/jpeg", quality: 0.92 });
+  return new File([blob], file.name.replace(/\.(heic|heif)$/i, "") + ".jpg", { type: "image/jpeg" });
+}
