@@ -59,6 +59,42 @@ export function pageNumberTotal(pageCount: number, o: Pick<PageNumberOptions, "f
   return pageCount;
 }
 
+export type FormFieldKind = "text" | "checkbox" | "dropdown" | "optionlist" | "radio" | "unsupported";
+
+export type FormValue = string | boolean | string[];
+
+/** An AcroForm field as Edit PDF shows it. Plain data, so it can cross the worker boundary. */
+export interface FormFieldInfo {
+  name: string;
+  kind: FormFieldKind;
+  /** Text for text fields, checked state for checkboxes, selected option(s) for choice fields. */
+  value: FormValue;
+  options: string[];
+  readOnly: boolean;
+  multiline: boolean;
+  multiSelect: boolean;
+  /** Dropdowns that also accept a typed value. */
+  editable: boolean;
+  maxLength?: number;
+  /** 0-based page of the field's first widget, if it could be found. */
+  page: number | null;
+}
+
+export interface FormInspection {
+  fields: FormFieldInfo[];
+  /** XFA data is dropped before filling; pdf-lib can only fill the AcroForm part. */
+  hasXfa: boolean;
+}
+
+export type FormFont = "Helvetica" | "TimesRoman" | "Courier";
+
+export interface FillFormOptions {
+  font: FormFont;
+  /** In points; 0 lets text shrink to fit the field. */
+  fontSize: number;
+  flatten: boolean;
+}
+
 /** Operations implemented by pdf.worker.ts. */
 export type PdfApi = {
   info(data: ArrayBuffer): PdfInfo;
@@ -68,4 +104,7 @@ export type PdfApi = {
   images(pages: RasterPage[], title?: string): Uint8Array;
   pageNumbers(data: ArrayBuffer, options: PageNumberOptions): Uint8Array;
   sign(data: ArrayBuffer, png: Uint8Array, placements: DisplayRect[]): Uint8Array;
+  inspectForm(data: ArrayBuffer): FormInspection;
+  /** Sets only the fields named in `values`, so untouched fields keep their original appearance. */
+  fillForm(data: ArrayBuffer, values: Record<string, FormValue>, options: FillFormOptions): Uint8Array;
 };

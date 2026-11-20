@@ -13,12 +13,15 @@ export function PdfPageCanvas({
   pageNumber,
   width = 160,
   rotation = 0,
+  drawForms,
   className,
 }: {
   doc: PDFDocumentProxy;
   pageNumber: number;
   width?: number;
   rotation?: number;
+  /** Paint form field values onto the canvas (Edit PDF's preview). */
+  drawForms?: boolean;
   className?: string;
 }) {
   const holder = useRef<HTMLDivElement>(null);
@@ -30,7 +33,7 @@ export function PdfPageCanvas({
       try {
         const page = await doc.getPage(pageNumber);
         const dpr = Math.min(2, window.devicePixelRatio || 1);
-        const canvas = await renderPage(page, { maxWidth: width * dpr, maxHeight: width * dpr * 1.6, rotation });
+        const canvas = await renderPage(page, { maxWidth: width * dpr, maxHeight: width * dpr * 1.6, rotation, drawForms });
         if (cancelled || !holder.current) return;
         canvas.className = "block h-auto max-w-full";
         canvas.style.width = `${canvas.width / dpr}px`;
@@ -42,7 +45,7 @@ export function PdfPageCanvas({
     return () => {
       cancelled = true;
     };
-  }, [doc, pageNumber, width, rotation]);
+  }, [doc, pageNumber, width, rotation, drawForms]);
 
   return (
     <div ref={holder} className={cn("flex items-center justify-center", className)} style={{ minHeight: width * 0.5 }}>

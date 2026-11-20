@@ -108,6 +108,14 @@ export const TOOL_DETAILS: Record<string, ToolDetails> = {
       "A drawn signature is a simple electronic signature, which is accepted for many everyday documents, but some agreements need a certified digital signature. Our guide on [how to sign a PDF](/guides/how-to-sign-a-pdf) covers this and some tips for a cleaner signature.",
     ],
   },
+  "edit-pdf": {
+    heading: "Filling a PDF form vs building a custom PDF",
+    paragraphs: [
+      "A PDF form made in Acrobat, LibreOffice or a government portal contains interactive AcroForm fields: text boxes, checkboxes, dropdowns, list boxes and radio buttons. Edit PDF reads them with pdf-lib, lists each one as a normal input labelled with its page, and refills a fresh copy of the document every time you type, so the preview always shows exactly what you will download. Only the fields you change are rewritten, in Helvetica, Times or Courier, and the rest keep the form's original look. Read-only fields stay locked.",
+      "Before sending a finished form, turn on Flatten form. The values become part of the page, so they can't be altered and look the same in every viewer. Need to add a signature as well? Download the filled form and open it in [Sign PDF](/tools/sign-pdf). To send only some pages, use [Split PDF](/tools/split-pdf), and to fit an upload limit, [Compress PDF](/tools/compress-pdf).",
+      "When a PDF has no form fields, or you want full control of the typography, the Custom PDF Builder starts from a template instead. Every heading, paragraph and key–value row is live text: choose one of five web fonts, set size, line height and spacing, and style any word or single letter with its own colour, weight, italic, underline, font and letter spacing. Pages flow onto A4 or US Letter as you type, and the finished document downloads as a PDF made entirely in your browser.",
+    ],
+  },
   "rotate-pdf": {
     heading: "Fix sideways and upside-down pages",
     paragraphs: [

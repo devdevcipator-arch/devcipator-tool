@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
-import { PDFDocument, PDFPage, StandardFonts, degrees, rgb } from "pdf-lib";
+import { PDFCheckBox, PDFDocument, PDFDropdown, PDFOptionList, PDFPage, PDFRadioGroup, PDFTextField, StandardFonts, degrees, rgb, type PDFField, type PDFFont } from "pdf-lib";
 import { exposeWorker, type WorkerContext } from "@/lib/worker-rpc";
-import { pageNumberTotal, type DisplayRect, type OrganizedPage, type PageNumberOptions, type PdfApi, type RasterPage } from "@/lib/pdf/api";
+import { pageNumberTotal, type DisplayRect, type FillFormOptions, type FormFieldInfo, type FormValue, type OrganizedPage, type PageNumberOptions, type PdfApi, type RasterPage } from "@/lib/pdf/api";
 
 function friendlyLoadError(err: unknown): Error {
   const msg = err instanceof Error ? err.message : String(err);
@@ -61,6 +61,63 @@ async function drawRaster(doc: PDFDocument, p: RasterPage) {
   const w = p.pixelWidth * scale;
   const h = p.pixelHeight * scale;
   page.drawImage(img, { x: (p.pageWidth - w) / 2, y: (p.pageHeight - h) / 2, width: w, height: h });
+}
+
+/** 0-based page of a field's first widget; widgets don't always carry a /P entry, so page /Annots are checked too. */
+function fieldPage(doc: PDFDocument, field: PDFField, pageOfAnnot: Map<string, number>, pageOfRef: Map<string, number>): number | null {
+  for (const widget of field.acroField.getWidgets()) {
+    const p = widget.P();
+    if (p && pageOfRef.has(p.toString())) return pageOfRef.get(p.toString())!;
+    const ref = doc.context.getObjectRef(widget.dict);
+    if (ref && pageOfAnnot.has(ref.toString())) return pageOfAnnot.get(ref.toString())!;
+  }
+  return null;
+}
+
+function describeField(field: PDFField): Omit<FormFieldInfo, "page"> {
+  const base = { name: field.getName(), readOnly: field.isReadOnly(), options: [] as string[], multiline: false, multiSelect: false, editable: false };
+  if (field instanceof PDFTextField) {
+    return { ...base, kind: "text", value: field.getText() ?? "", multiline: field.isMultiline(), maxLength: field.getMaxLength() };
+  }
+  if (field instanceof PDFCheckBox) return { ...base, kind: "checkbox", value: field.isChecked() };
+  if (field instanceof PDFDropdown) {
+    return { ...base, kind: "dropdown", value: field.getSelected(), options: field.getOptions(), multiSelect: field.isMultiselect(), editable: field.isEditable() };
+  }
+  if (field instanceof PDFOptionList) {
+    return { ...base, kind: "optionlist", value: field.getSelected(), options: field.getOptions(), multiSelect: field.isMultiselect() };
+  }
+  if (field instanceof PDFRadioGroup) return { ...base, kind: "radio", value: field.getSelected() ?? "", options: field.getOptions() };
+  // Buttons and signature fields have nothing to type into.
+  return { ...base, kind: "unsupported", value: "" };
+}
+
+/** Writes one value and redraws the field's appearance; returns false when the field rejected it. */
+function setField(field: PDFField, value: FormValue, font: PDFFont, fontSize: number): boolean {
+  try {
+    if (field instanceof PDFTextField) {
+      const max = field.getMaxLength();
+      field.setText(typeof value === "string" ? (max ? value.slice(0, max) : value) : "");
+      if (fontSize > 0) field.setFontSize(fontSize);
+      field.updateAppearances(font);
+    } else if (field instanceof PDFCheckBox || field instanceof PDFRadioGroup) {
+      if (field instanceof PDFCheckBox) {
+        if (value === true) field.check();
+        else field.uncheck();
+      } else if (typeof value === "string" && value) field.select(value);
+      else field.clear();
+      // Keep the form's own check marks; only draw default ones where a widget has none.
+      if (field.acroField.getWidgets().some((w) => !w.getAppearances())) field.updateAppearances();
+    } else if (field instanceof PDFDropdown || field instanceof PDFOptionList) {
+      const picked = (Array.isArray(value) ? value : [value]).filter((v): v is string => typeof v === "string" && v !== "");
+      if (picked.length) field.select(picked);
+      else field.clear();
+      if (fontSize > 0) field.setFontSize(fontSize);
+      field.updateAppearances(font);
+    }
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 exposeWorker<PdfApi>({
@@ -166,5 +223,47 @@ exposeWorker<PdfApi>({
     }
     stamp(doc);
     return doc.save({ useObjectStreams: true });
+  },
+
+  async inspectForm(data: ArrayBuffer, ctx: WorkerContext) {
+    ctx.progress(null, "Reading form fields");
+    const doc = await load(data);
+    const form = doc.getForm();
+    const pageOfRef = new Map<string, number>();
+    const pageOfAnnot = new Map<string, number>();
+    doc.getPages().forEach((page, i) => {
+      pageOfRef.set(page.ref.toString(), i);
+      const annots = page.node.Annots();
+      if (!annots) return;
+      for (let j = 0; j < annots.size(); j++) pageOfAnnot.set(annots.get(j).toString(), i);
+    });
+    const fields = form.getFields().map((f) => ({ ...describeField(f), page: fieldPage(doc, f, pageOfAnnot, pageOfRef) }));
+    return { fields, hasXfa: form.hasXFA() };
+  },
+
+  async fillForm(data: ArrayBuffer, values: Record<string, FormValue>, o: FillFormOptions, ctx: WorkerContext) {
+    ctx.progress(null, "Filling the form");
+    const doc = await load(data);
+    const form = doc.getForm();
+    // Viewers that understand XFA would show its (unfilled) copy of the form instead of ours.
+    if (form.hasXFA()) form.deleteXFA();
+    const font = await doc.embedFont(StandardFonts[o.font]);
+    const failed: string[] = [];
+    for (const [name, value] of Object.entries(values)) {
+      const field = form.getFieldMaybe(name);
+      if (field && !setField(field, value, font, o.fontSize)) failed.push(name);
+    }
+    if (o.flatten) {
+      ctx.progress(null, "Flattening");
+      try {
+        form.flatten({ updateFieldAppearances: false });
+      } catch (err) {
+        throw new Error(`This form could not be flattened (${err instanceof Error ? err.message : String(err)}). Turn off “Flatten form” and try again.`);
+      }
+    }
+    if (failed.length) console.warn("Edit PDF: fields that rejected their value:", failed);
+    stamp(doc);
+    ctx.progress(0.98, "Saving");
+    return doc.save({ useObjectStreams: true, updateFieldAppearances: false });
   },
 });

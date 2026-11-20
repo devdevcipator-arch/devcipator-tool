@@ -74,7 +74,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
     {
       "@type": "HowTo",
       "@id": `${url}#how-to`,
-      name: `How to use ${tool.title}`,
+      name: tool.howToTitle ?? `How to use ${tool.title}`,
       step: tool.steps.map((text, i) => ({ "@type": "HowToStep", position: i + 1, text })),
     },
     {
@@ -136,7 +136,7 @@ export default async function ToolPage({ params }: PageProps<"/tools/[slug]">) {
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 pt-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-12">
           <section aria-labelledby="how-to">
-            <h2 id="how-to" className="text-2xl font-semibold tracking-tight text-fg">How to use {tool.title}</h2>
+            <h2 id="how-to" className="text-2xl font-semibold tracking-tight text-fg">{tool.howToTitle ?? `How to use ${tool.title}`}</h2>
             <ol className="mt-5 grid gap-4 md:grid-cols-3">
               {tool.steps.map((step, i) => (
                 <li key={i} className="flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 md:flex-col md:p-5">

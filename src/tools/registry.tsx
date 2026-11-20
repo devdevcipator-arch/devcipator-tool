@@ -31,6 +31,7 @@ export const TOOL_COMPONENTS: Record<string, ComponentType> = {
   "images-to-pdf": dynamic(() => import("./document/ImagesToPdf"), { ssr: false, loading: sized() }),
   "pdf-to-images": dynamic(() => import("./document/PdfToImages"), { ssr: false, loading: sized() }),
   "sign-pdf": dynamic(() => import("./document/SignPdf"), { ssr: false, loading: sized() }),
+  "edit-pdf": dynamic(() => import("./document/EditPdf"), { ssr: false, loading: sized() }),
   "rotate-pdf": dynamic(() => import("./document/RotatePdf"), { ssr: false, loading: sized() }),
   "add-page-numbers": dynamic(() => import("./document/AddPageNumbers"), { ssr: false, loading: sized() }),
   // image

@@ -24,6 +24,7 @@ import {
   Scissors,
   Shrink,
   FileDown,
+  FilePenLine,
   Signature,
   Stamp,
   TextCursorInput,
@@ -69,6 +70,8 @@ export interface ToolConfig {
   faqs: ToolFaq[];
   /** Listed first under "Related tools"; may point to other categories. */
   related: string[];
+  /** Heading of the how-to steps and name of the HowTo schema; defaults to “How to use {title}”. */
+  howToTitle?: string;
   /** Set on conversion pages (see CONVERSIONS): the tool whose workspace they reuse. */
   variantOf?: string;
   /** Output format a conversion page starts on. */
@@ -101,14 +104,14 @@ export const CATEGORIES: CategoryConfig[] = [
     id: "document",
     label: "PDF",
     title: "PDF tools",
-    tagline: "Merge, compress, split, sign and convert PDFs.",
+    tagline: "Edit, merge, compress, split, sign and convert PDFs.",
     seoTitle: "Free PDF Tools – Merge, Compress, Sign",
-    metaDescription: "Free online PDF tools to merge, compress, split, sign, rotate and organize PDFs, or convert them to and from images. No upload: files stay on your device.",
+    metaDescription: "Free online PDF tools to edit, fill, merge, compress, split, sign and organize PDFs, or convert them to and from images. No upload: files stay on your device.",
     applicationCategory: "BusinessApplication",
     aboutTitle: "Edit PDFs without uploading them",
     about: [
       "Most online PDF tools send your document to a server, process it there and send it back. These don't. Merging, splitting, signing and converting all happen inside your browser using pdf-lib and Mozilla's PDF.js, so contracts, invoices and ID scans never leave your device. There is no account to create and no watermark on the result.",
-      "Use Merge PDF to combine several files into one, Compress PDF to shrink a file for email, and Split PDF or Organize PDF to pull out, reorder or delete pages. Rotate PDF fixes sideways scans, Add Page Numbers stamps “Page 1 of 10” style numbers, and Sign PDF lets you draw or upload a signature and place it on any page.",
+      "Use Merge PDF to combine several files into one, Compress PDF to shrink a file for email, and Split PDF or Organize PDF to pull out, reorder or delete pages. Rotate PDF fixes sideways scans, Add Page Numbers stamps “Page 1 of 10” style numbers, and Sign PDF lets you draw or upload a signature and place it on any page. Edit PDF fills in PDF forms with a live preview, or builds a new document from a template with per-letter fonts and colours.",
       "To move between formats, Images to PDF turns JPG and PNG photos into a paginated document, and PDF to Images exports pages as PNG or JPG at up to 300 DPI. Page operations copy the original content rather than re-rendering it, so text stays sharp and searchable.",
     ],
   },
@@ -375,6 +378,78 @@ export const TOOLS: ToolConfig[] = [
       { q: "Can I sign a PDF on my phone?", a: "Yes. Open Sign PDF in your phone's browser and draw your signature with your finger, then place it on the page." },
     ],
     related: ["add-page-numbers", "organize-pdf", "merge-pdf"],
+  },
+  {
+    slug: "edit-pdf",
+    title: "Edit PDF",
+    heading: "Edit PDF Online: Fill Forms or Build a Styled PDF",
+    category: "document",
+    icon: FilePenLine,
+    badges: ["New", "Live"],
+    description: "Fill in PDF forms, or build a styled PDF with live preview.",
+    intro: "Edit existing fillable PDF forms or build custom form-to-PDF documents with a real-time live preview, custom fonts and per-letter styling. Fill text boxes, checkboxes and dropdowns in any PDF form, or start from a letter, invoice or certificate template. Everything happens on your device.",
+    seoTitle: "Edit PDF Online Free – Fill PDF Forms",
+    metaDescription: "Fill in PDF forms online with a live preview, choose the font and flatten the result, or design a new PDF with custom fonts and per-letter styling. No upload.",
+    accept: PDF,
+    acceptLabel: "PDF",
+    maxSizeMB: 100,
+    multiple: false,
+    keywords: [
+      "edit pdf",
+      "edit pdf online free",
+      "fill pdf form",
+      "fill out pdf online",
+      "pdf form filler",
+      "type on pdf form",
+      "flatten pdf form",
+      "create pdf online",
+      "pdf maker with fonts",
+      "invoice pdf maker",
+      "certificate maker pdf",
+      "letter to pdf",
+    ],
+    howToTitle: "How to Edit a PDF Online",
+    steps: [
+      "To fill a form, open “Edit existing PDF” and drop a fillable PDF. Its text boxes, checkboxes, dropdowns and radio buttons are listed as ordinary inputs.",
+      "Type into the fields and watch the live preview update. Click a field to jump to its page, and pick Helvetica, Times or Courier and a font size.",
+      "Turn on “Flatten form” to lock the values in, then press Download Edited PDF.",
+      "To make a new document, open “Custom PDF Builder” and choose a blank page, formal letter, invoice or certificate template.",
+      "Edit, add or reorder headings, paragraphs and key–value rows, and set the font, size, spacing, colour and A4 or Letter page size.",
+      "Highlight a word, or turn on the Per-Letter Styler and click letters in the preview, to change their colour, weight, font or spacing. Then download the PDF.",
+    ],
+    features: [
+      "Detects text, checkbox, dropdown, list and radio fields",
+      "Live preview of the filled form, page by page",
+      "Helvetica, Times or Courier at any size for filled fields",
+      "Flatten the form so values can't be changed",
+      "Letter, invoice, certificate and blank templates",
+      "Five web fonts: Inter, Lora, Playfair Display, Roboto Mono, Merriweather",
+      "Per-letter colour, weight, italic, underline, font and spacing",
+      "A4 or US Letter, portrait or landscape, 288 DPI export or print",
+    ],
+    faqs: [
+      {
+        q: "Why can't I change the font of a single letter in my existing PDF?",
+        a: "Most PDFs are flattened: text is drawn at fixed positions using embedded fonts that often contain only the characters the document uses. There are no editable paragraphs to restyle, so changing one letter's font would mean rebuilding the page. Fillable form fields are the exception, and Edit PDF lets you set their font and size.",
+      },
+      {
+        q: "How is the Custom PDF Builder different?",
+        a: "The builder creates the document from scratch in your browser, so every character is live text until you export. You can give any word or single letter its own colour, weight, italic, underline, font and letter spacing, and the preview updates as you type.",
+      },
+      {
+        q: "What does “Flatten form” do?",
+        a: "It turns the filled fields into ordinary page content. The values look the same, but nobody can edit them in a PDF reader afterwards, which suits forms you send off as final.",
+      },
+      {
+        q: "My PDF says it has no form fields. Why?",
+        a: "Only PDFs with interactive AcroForm fields can be filled. Scanned documents and PDFs exported from Word without form fields have none, and XFA forms made in Adobe LiveCycle only work in Adobe Reader. Use the Custom PDF Builder to recreate the document instead.",
+      },
+      {
+        q: "Is the text in a builder PDF selectable?",
+        a: "Download PDF saves each page as a sharp 288 DPI image, so the result looks identical everywhere but its text can't be selected. For selectable text, use Print and choose “Save as PDF” in your browser's print dialog.",
+      },
+    ],
+    related: ["merge-pdf", "split-pdf", "compress-pdf", "organize-pdf"],
   },
   {
     slug: "rotate-pdf",
@@ -1260,7 +1335,7 @@ export const SITE = {
   url:
     process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL ? "https://tools.devcipator.com" : "http://localhost:3000"),
   /** Sitemap lastModified dates. Bump `content` when tool or category copy changes, `legal` when privacy or terms change. */
-  updated: { content: "2026-11-06", legal: "2026-10-24" },
+  updated: { content: "2026-11-19", legal: "2026-10-24" },
 };
 
 /** <title> and description for the fixed pages. Titles of pages other than home get the layout's “| Devcipator Tools” suffix. */

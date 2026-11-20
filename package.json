@@ -16,6 +16,7 @@
     "browser-image-compression": "^2.0.2",
     "file-saver": "^2.0.5",
     "heic-to": "1.6.6",
+    "html2canvas-pro": "2.5.4",
     "jsbarcode": "^3.12.3",
     "jsqr": "^1.4.0",
     "jszip": "^3.10.2",

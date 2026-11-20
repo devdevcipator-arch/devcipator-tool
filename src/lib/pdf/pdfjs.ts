@@ -61,6 +61,8 @@ export interface RenderOptions {
   /** Extra clockwise rotation in degrees. */
   rotation?: number;
   background?: string;
+  /** Draw form fields from their appearance streams; by default PDF.js leaves them to an HTML form layer we don't render. */
+  drawForms?: boolean;
 }
 
 export async function renderPage(page: PDFPageProxy, opts: RenderOptions = {}): Promise<HTMLCanvasElement> {
@@ -77,7 +79,8 @@ export async function renderPage(page: PDFPageProxy, opts: RenderOptions = {}): 
   const ctx = canvas.getContext("2d")!;
   ctx.fillStyle = opts.background ?? "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+  const annotationMode = opts.drawForms ? (await getPdfjs()).AnnotationMode.ENABLE : undefined;
+  await page.render({ canvas, canvasContext: ctx, viewport, annotationMode }).promise;
   return canvas;
 }
 
