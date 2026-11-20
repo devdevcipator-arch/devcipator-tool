@@ -26,7 +26,21 @@ function charCss(m: CharStyle | null): CSSProperties | undefined {
   };
 }
 
-function Text({ st, block, part, ix }: { st: StyledText; block: string; part: Part; ix?: Interaction }) {
+/** A block on a page; a paragraph split across pages shows only characters `start`–`end` here. */
+export interface Piece {
+  block: Block;
+  start?: number;
+  end?: number;
+  /** More of this paragraph follows on the next page. */
+  cont?: boolean;
+}
+
+function slice(st: StyledText, start = 0, end = st.text.length): StyledText {
+  return start === 0 && end === st.text.length ? st : { text: st.text.slice(start, end), marks: st.marks.slice(start, end) };
+}
+
+/** `offset` maps letters back to their index in the whole field when only a slice is shown. */
+function Text({ st, block, part, ix, offset = 0 }: { st: StyledText; block: string; part: Part; ix?: Interaction; offset?: number }) {
   // A zero-width space keeps an emptied line at its normal height.
   if (!st.text) return <span>{"​"}</span>;
   const sel = ix?.selection && ix.selection.block === block && ix.selection.part === part && ix.selection.end > ix.selection.start ? ix.selection : null;
@@ -34,13 +48,14 @@ function Text({ st, block, part, ix }: { st: StyledText; block: string; part: Pa
     return (
       <>
         {Array.from(st.text, (ch, i) => {
-          const picked = sel && i >= sel.start && i < sel.end;
+          const at = i + offset;
+          const picked = sel && at >= sel.start && at < sel.end;
           return (
             <span
               key={i}
               data-block={block}
               data-part={part}
-              data-i={i}
+              data-i={at}
               style={{ ...charCss(st.marks[i]), ...(picked ? { backgroundColor: "rgba(37, 99, 235, 0.22)", borderRadius: 2 } : null) }}
               className={ix?.perLetter ? "cursor-pointer hover:outline hover:outline-1 hover:outline-[#2563eb]" : undefined}
             >
@@ -62,7 +77,7 @@ function Text({ st, block, part, ix }: { st: StyledText; block: string; part: Pa
   );
 }
 
-export function BlockView({ block, settings, ix }: { block: Block; settings: DocSettings; ix?: Interaction }) {
+export function BlockView({ block, settings, ix, start, end, cont }: { block: Block; settings: DocSettings; ix?: Interaction } & Omit<Piece, "block">) {
   if (block.type === "keyvalue") {
     return (
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1.5em", borderBottom: `1px solid ${settings.accent}40`, paddingBottom: "0.35em", whiteSpace: "pre-wrap" }}>
@@ -76,16 +91,19 @@ export function BlockView({ block, settings, ix }: { block: Block; settings: Doc
     );
   }
   const heading = block.type === "heading";
+  const shown = slice(block.text, start, end);
   return (
     <div
       style={{
         textAlign: block.align,
+        // A justified paragraph that continues on the next page keeps its last line here justified too.
+        textAlignLast: cont && block.align === "justify" && !shown.text.endsWith("\n") ? "justify" : undefined,
         whiteSpace: "pre-wrap",
         overflowWrap: "break-word",
         ...(heading && { color: settings.accent, fontWeight: 700, lineHeight: 1.2, fontSize: block.level === 1 ? "2.1em" : "1.35em" }),
       }}
     >
-      <Text st={block.text} block={block.id} part="text" ix={ix} />
+      <Text st={shown} block={block.id} part="text" ix={ix} offset={start ?? 0} />
     </div>
   );
 }
@@ -96,7 +114,7 @@ export function bodyStyle(s: DocSettings): CSSProperties {
 }
 
 /** One sheet of paper at its real size in CSS pixels (96 per inch). */
-export function Sheet({ blocks, settings, ix }: { blocks: Block[]; settings: DocSettings; ix?: Interaction }) {
+export function Sheet({ pieces, settings, ix }: { pieces: Piece[]; settings: DocSettings; ix?: Interaction }) {
   const { width, height } = pageDims(settings);
   const margin = settings.margin * 96;
   const frameInset = Math.max(12, margin * 0.4);
@@ -111,9 +129,9 @@ export function Sheet({ blocks, settings, ix }: { blocks: Block[]; settings: Doc
           <div aria-hidden style={{ position: "absolute", inset: frameInset + 7, border: `1px solid ${settings.accent}` }} />
         </>
       )}
-      <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: settings.spacing * PX_PER_PT, height: "100%", justifyContent: settings.frame ? "center" : undefined }}>
-        {blocks.map((b) => (
-          <BlockView key={b.id} block={b} settings={settings} ix={ix} />
+      <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: settings.spacing * PX_PER_PT, height: "100%", justifyContent: settings.frame ? "safe center" : undefined }}>
+        {pieces.map((p) => (
+          <BlockView key={`${p.block.id}:${p.start ?? 0}`} block={p.block} start={p.start} end={p.end} cont={p.cont} settings={settings} ix={ix} />
         ))}
       </div>
     </div>

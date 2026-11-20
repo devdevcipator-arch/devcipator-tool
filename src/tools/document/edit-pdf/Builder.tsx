@@ -54,7 +54,7 @@ import {
   type Selection,
   type TemplateId,
 } from "./model";
-import { BlockView, INK, Sheet, bodyStyle } from "./Sheet";
+import { BlockView, INK, Sheet, bodyStyle, type Piece } from "./Sheet";
 
 /** html2canvas scale: 3 × 96 = 288 DPI, sharp in print without huge files. */
 const EXPORT_SCALE = 3;
@@ -79,19 +79,77 @@ const ALIGNS: Array<{ value: Align; label: string; icon: ReactNode }> = [
 
 const BLOCK_LABEL: Record<BlockType, string> = { heading: "Heading", paragraph: "Paragraph", keyvalue: "Key–value row" };
 
-/** Groups block indices into pages from their measured heights; a block never splits across pages. */
-function paginate(heights: number[], pageContent: number, gap: number): number[][] {
-  const pages: number[][] = [[]];
+/** A block's slot on a page, by index; `start`/`end` mark the characters of a paragraph split across pages. */
+type Slot = { block: number; start?: number; end?: number; cont?: boolean };
+
+/** A measured block: its height and, for paragraphs, where each line starts (character index and offset from the block's top). */
+type Measured = { height: number; lines?: Array<{ start: number; y: number }> };
+
+/** Finds where each rendered line of a block begins, from the positions of its characters. */
+function measureLines(el: Element, fontPx: number): Array<{ start: number; y: number }> {
+  const lines: Array<{ start: number; y: number }> = [];
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  let offset = 0;
+  let firstTop = 0;
+  let lineTop = -Infinity;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const len = node.textContent?.length ?? 0;
+    for (let i = 0; i < len; i++) {
+      range.setStart(node, i);
+      range.setEnd(node, i + 1);
+      const r = range.getClientRects()[0];
+      // Same-size letters on one line differ in top by far less than half a line; the next line is at least one em lower.
+      if (!r || r.top <= lineTop + fontPx * 0.5) continue;
+      if (!lines.length) firstTop = r.top;
+      lines.push({ start: offset + i, y: lines.length ? r.top - firstTop : 0 });
+      lineTop = r.top;
+    }
+    offset += len;
+  }
+  return lines;
+}
+
+/**
+ * Lays blocks out on pages from their measured heights. Paragraphs split between lines when they don't
+ * fit; headings and key–value rows move to the next page whole.
+ */
+function paginate(blocks: Measured[], textLength: (i: number) => number, pageContent: number, gap: number): Slot[][] {
+  const pages: Slot[][] = [[]];
   let used = 0;
-  heights.forEach((h, i) => {
-    const page = pages[pages.length - 1];
-    const need = page.length ? used + gap + h : h;
-    if (page.length && need > pageContent + 0.5) {
-      pages.push([i]);
-      used = h;
-    } else {
-      page.push(i);
-      used = need;
+  const limit = pageContent + 0.5;
+  blocks.forEach((m, i) => {
+    const lines = m.lines && m.lines.length > 1 ? m.lines : null;
+    // Offset of line `k` from the block's top; one past the last line is the block's bottom.
+    const yAt = (k: number) => (k === 0 ? 0 : lines && k < lines.length ? lines[k].y : m.height);
+    let from = 0;
+    for (;;) {
+      const page = pages[pages.length - 1];
+      const room = limit - (page.length ? used + gap : 0);
+      const rest = m.height - yAt(from);
+      const start = lines ? lines[from].start : undefined;
+      if (rest <= room || (!page.length && !lines)) {
+        page.push(lines && from > 0 ? { block: i, start } : { block: i });
+        used = (page.length > 1 ? used + gap : 0) + rest;
+        return;
+      }
+      if (lines) {
+        let k = 0;
+        while (from + k + 1 < lines.length && yAt(from + k + 1) - yAt(from) <= room) k++;
+        // Not even one line fits an empty page: place the rest here (cut off) rather than loop forever.
+        if (k === 0 && !page.length) {
+          page.push(from > 0 ? { block: i, start } : { block: i });
+          used = rest;
+          return;
+        }
+        if (k > 0) {
+          const end = from + k < lines.length ? lines[from + k].start : textLength(i);
+          page.push({ block: i, start: from > 0 ? start : 0, end, cont: true });
+          from += k;
+        }
+      }
+      pages.push([]);
+      used = 0;
     }
   });
   return pages;
@@ -104,7 +162,7 @@ export default function Builder({ active }: { active: boolean }) {
   const [settings, setSettings] = useState<DocSettings>(initial.settings);
   const [sel, setSel] = useState<Selection | null>(null);
   const [perLetter, setPerLetter] = useState(false);
-  const [pages, setPages] = useState<number[][]>([blocks.map((_, i) => i)]);
+  const [pages, setPages] = useState<Slot[][]>([blocks.map((_, i) => ({ block: i }))]);
   const [tooTall, setTooTall] = useState(false);
   const [fontTick, setFontTick] = useState(0);
   const [previewWidth, setPreviewWidth] = useState(560);
@@ -130,10 +188,19 @@ export default function Builder({ active }: { active: boolean }) {
     const el = measureRef.current;
     if (!el) return;
     const content = dims.height - marginPx * 2;
-    const heights = Array.from(el.children, (c) => c.getBoundingClientRect().height);
-    const next = paginate(heights, content, settings.spacing * PX_PER_PT);
+    const fontPx = settings.fontSize * PX_PER_PT;
+    const measured: Measured[] = Array.from(el.children, (c, i) => ({
+      height: c.getBoundingClientRect().height,
+      lines: blocks[i]?.type === "paragraph" ? measureLines(c, fontPx) : undefined,
+    }));
+    const textLength = (i: number) => {
+      const b = blocks[i];
+      return b && b.type !== "keyvalue" ? b.text.text.length : 0;
+    };
+    const next = paginate(measured, textLength, content, settings.spacing * PX_PER_PT);
     setPages((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
-    setTooTall(heights.some((h) => h > content + 0.5));
+    // Only a heading/row taller than a page, or a single line that is, still gets cut off.
+    setTooTall(measured.some((m) => (m.lines && m.lines.length > 1 ? m.lines.some((l, k) => (k + 1 < m.lines!.length ? m.lines![k + 1].y : m.height) - l.y > content + 0.5) : m.height > content + 0.5)));
   }, [blocks, settings, fontTick, dims.height, marginPx]);
 
   useEffect(() => {
@@ -255,8 +322,11 @@ export default function Builder({ active }: { active: boolean }) {
 
   const running = processor.status === "running";
 
+  // Slots point at blocks by index; drop any left stale for a frame after a block is removed.
+  const pieces = (page: Slot[]): Piece[] => page.flatMap((s) => (blocks[s.block] ? [{ ...s, block: blocks[s.block] }] : []));
+
   const sheets = (ix?: { selection: Selection | null; perLetter: boolean }) =>
-    pages.map((idx, n) => <Sheet key={n} blocks={idx.map((i) => blocks[i]).filter(Boolean)} settings={settings} ix={ix} />);
+    pages.map((page, n) => <Sheet key={n} pieces={pieces(page)} settings={settings} ix={ix} />);
 
   return (
     <div className="grid items-start gap-6 md:grid-cols-2">
@@ -376,7 +446,8 @@ export default function Builder({ active }: { active: boolean }) {
       </div>
 
       {/* ─────────── Right: styler, live preview, export ─────────── */}
-      <div className="flex min-w-0 flex-col gap-4 md:sticky md:top-20 md:max-h-[calc(100dvh-6rem)]">
+      {/* Sticky beside the form; on short windows the column scrolls rather than squeezing the preview. */}
+      <div className="flex min-w-0 flex-col gap-4 md:sticky md:top-20 md:max-h-[calc(100dvh-6rem)] md:overflow-y-auto md:overscroll-contain md:p-1 md:-m-1">
         <Panel
           title="Letter styling"
           actions={
@@ -445,7 +516,7 @@ export default function Builder({ active }: { active: boolean }) {
           </fieldset>
         </Panel>
 
-        <section className="flex min-h-0 flex-col rounded-2xl border border-border bg-surface shadow-card md:flex-1">
+        <section className="flex flex-col rounded-2xl border border-border bg-surface shadow-card md:min-h-[26rem] md:flex-1">
           <header className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
             <h2 className="text-sm font-semibold text-fg">
               Live preview · {settings.pageSize === "a4" ? "A4" : "US Letter"} · {pages.length} page{pages.length === 1 ? "" : "s"}
@@ -467,23 +538,24 @@ export default function Builder({ active }: { active: boolean }) {
               onClick={(e) => pickLetter(e, false)}
               onDoubleClick={(e) => pickLetter(e, true)}
             >
-              {pages.map((idx, n) => (
+              {pages.map((page, n) => (
                 <div key={n} className="shrink-0 overflow-hidden bg-white shadow-card ring-1 ring-border" style={{ width: dims.width * scale, height: dims.height * scale }}>
                   <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: dims.width }}>
-                    <Sheet blocks={idx.map((i) => blocks[i]).filter(Boolean)} settings={settings} ix={{ selection: activeSel, perLetter }} />
+                    <Sheet pieces={pieces(page)} settings={settings} ix={{ selection: activeSel, perLetter }} />
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          {(running || processor.status === "error" || processor.status === "done") && (
-            <div className="flex flex-col gap-3 border-t border-border p-4">
-              {running && <ProgressBar progress={processor.progress} />}
-              {processor.status === "error" && processor.error && <Notice tone="danger">{processor.error}</Notice>}
-              {processor.status === "done" && <ResultList results={processor.results} zipName="edit-pdf.zip" />}
-            </div>
-          )}
         </section>
+        {/* Below the preview, not inside it, so a finished download never shrinks the pages. */}
+        {(running || processor.status === "error" || processor.status === "done") && (
+          <div className="flex shrink-0 flex-col gap-3">
+            {running && <ProgressBar progress={processor.progress} />}
+            {processor.status === "error" && processor.error && <Notice tone="danger">{processor.error}</Notice>}
+            {processor.status === "done" && <ResultList results={processor.results} zipName="edit-pdf.zip" />}
+          </div>
+        )}
         <p className="text-xs text-fg-subtle">
           Download PDF renders each page as a sharp {EXPORT_SCALE * 96} DPI image. Print → “Save as PDF” keeps the text selectable.
         </p>
