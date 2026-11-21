@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Search, X } from "lucide-react";
 import { CATEGORIES, TOOLS, type ToolCategory } from "@/config/tools.config";
 import { searchTools } from "@/lib/search";
 import { CATEGORY_STYLE } from "@/lib/category-style";
 import { cn } from "@/lib/cn";
+import { HeroSearch } from "./HeroSearch";
 import { ToolCard } from "./ToolCard";
 import { QuickAccess } from "./QuickAccess";
 
@@ -25,7 +25,7 @@ export function ToolExplorer() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-border">
+      <section className="relative z-30 border-b border-border">
         <div className="bg-grid absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_75%)]" aria-hidden />
         <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 pb-14 pt-16 text-center sm:px-6 sm:pt-24">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-fg-muted shadow-card">
@@ -44,27 +44,7 @@ export function ToolExplorer() {
           <p className="max-w-2xl text-balance text-lg text-fg-muted">
             Merge and sign PDFs, compress images, cut audio, make QR codes and more. Your files are processed on your device and never uploaded.
           </p>
-          <div className="relative w-full max-w-xl">
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-fg-subtle" aria-hidden />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search tools, e.g. “mp3”"
-              aria-label="Search tools"
-              className="h-14 w-full rounded-2xl border border-border-strong bg-surface pl-12 pr-12 text-base [&::-webkit-search-cancel-button]:appearance-none text-fg shadow-pop placeholder:text-fg-subtle focus:border-primary focus:outline-none"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                aria-label="Clear search"
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-fg-subtle hover:text-fg cursor-pointer pointer-coarse:right-1 pointer-coarse:p-3.5"
-              >
-                <X className="size-4" />
-              </button>
-            )}
-          </div>
+          <HeroSearch query={query} onQueryChange={setQuery} />
         </div>
       </section>
 
