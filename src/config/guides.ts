@@ -158,11 +158,11 @@ export const GUIDES: GuideConfig[] = [
   {
     slug: "png-vs-jpg-vs-webp",
     keywords: ["png vs jpg","jpg vs webp","png vs webp","best image format for web","which image format to use"],
-    title: "PNG vs JPG vs WebP: Which Image Format to Use",
+    title: "PNG vs JPG vs WebP: Which Format to Use",
     description: "PNG, JPG or WebP? A plain comparison of quality, file size, transparency and support, with which format to pick for photos, logos, screenshots and websites.",
     answer: "Use JPG for photos you want to share, PNG for screenshots, logos and anything transparent, and WebP for the smallest files on websites. WebP works in all current browsers, but some older apps still expect JPG or PNG.",
     published: "2026-11-06",
-    updated: "2026-11-06",
+    updated: "2026-11-28",
     tools: ["image-converter", "compress-image"],
     sections: [
       {
@@ -237,11 +237,11 @@ export const GUIDES: GuideConfig[] = [
   {
     slug: "how-to-sign-a-pdf",
     keywords: ["how to sign a pdf","sign pdf without printing","add signature to pdf online","electronic signature pdf"],
-    title: "How to Sign a PDF Online Without Printing It",
+    title: "How to Sign a PDF Online Without Printing",
     description: "Add your signature to a PDF without printing or scanning: draw it or upload an image, place it on any page and download. Free and without uploading the PDF.",
     answer: "To sign a PDF without printing it, open it in [Sign PDF](/tools/sign-pdf), draw your signature or upload a picture of it, drag it to the right spot and download the signed copy. The document stays on your device the whole time.",
     published: "2026-11-06",
-    updated: "2026-11-06",
+    updated: "2026-11-28",
     tools: ["sign-pdf", "add-page-numbers", "merge-pdf"],
     sections: [
       {
@@ -279,11 +279,11 @@ export const GUIDES: GuideConfig[] = [
   {
     slug: "do-qr-codes-expire",
     keywords: ["do qr codes expire","static vs dynamic qr code","qr code that never expires","why did my qr code stop working"],
-    title: "Do QR Codes Expire? Static vs Dynamic Codes",
+    title: "Do QR Codes Expire? Static vs Dynamic",
     description: "Why some QR codes stop working, the difference between static and dynamic QR codes, and how to make a free QR code that never expires. Plain-English guide.",
     answer: "A static QR code never expires: the link or text is stored inside the code itself, so it works as long as that link does. Dynamic QR codes point to a redirect on a company's server and can stop working when a trial or subscription ends. The [QR Code Generator](/tools/qr-code) here makes static codes.",
     published: "2026-11-06",
-    updated: "2026-11-06",
+    updated: "2026-11-28",
     tools: ["qr-code", "barcode-generator"],
     sections: [
       {
@@ -321,11 +321,11 @@ export const GUIDES: GuideConfig[] = [
   {
     slug: "how-to-compress-image-to-100kb",
     keywords: ["how to compress image to 100kb","reduce photo size for online form","passport photo 50kb","signature 20kb"],
-    title: "How to Compress an Image to 100 KB for Forms",
-    description: "Get a photo, passport picture or signature under 100 KB, 50 KB or 20 KB for job portals and online forms: crop, resize, then compress. Free and without uploading.",
+    title: "How to Compress an Image to 100 KB",
+    description: "Get a photo, passport picture or signature under 100 KB, 50 KB or 20 KB for job portals and online forms: crop, resize, then compress. Free, with no upload.",
     answer: "To get an image under 100 KB, open [Compress Image to 100 KB](/tools/compress-image-to-100kb), add the photo and press Compress. If the result is still too big or blurry, crop it to the required shape and lower its pixel size first; fewer pixels reach small sizes with better quality.",
     published: "2026-11-06",
-    updated: "2026-11-06",
+    updated: "2026-11-28",
     tools: ["compress-image-to-100kb", "crop-image", "resize-image"],
     sections: [
       {
@@ -363,11 +363,11 @@ export const GUIDES: GuideConfig[] = [
   {
     slug: "how-to-combine-pdf-and-jpg",
     keywords: ["combine pdf and jpg","merge pdf and jpg into one pdf","add image to pdf","combine photos and pdf"],
-    title: "How to Combine PDF and JPG Files Into One PDF",
-    description: "Put PDFs and photos or scans into a single PDF in the right order: convert the images, merge everything, then shrink the file if needed. Free and without uploading.",
+    title: "How to Combine PDF and JPG Into One PDF",
+    description: "Put PDFs and photos or scans into a single PDF in the right order: convert the images, merge everything, then shrink the file if needed. Free, with no upload.",
     answer: "To combine PDF and JPG files, first turn the images into a PDF with [Images to PDF](/tools/images-to-pdf), then add that file and your other PDFs to [Merge PDF](/tools/merge-pdf) and put them in order. If the result is too large to send, shrink it with [Compress PDF](/tools/compress-pdf).",
     published: "2026-11-06",
-    updated: "2026-11-06",
+    updated: "2026-11-28",
     tools: ["images-to-pdf", "merge-pdf", "compress-pdf"],
     sections: [
       {

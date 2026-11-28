@@ -684,23 +684,29 @@ export const TOOLS: ToolConfig[] = [
     badges: ["Popular"],
     description: "Trim audio on a waveform with draggable handles.",
     intro: "Cut a section out of any song or recording. Drag the start and end handles on the waveform, preview the selection and export it as WAV or MP3. The audio is edited on your device and never uploaded.",
-    seoTitle: "Audio Cutter – Cut MP3 Online Free",
-    metaDescription: "Cut MP3 and other audio files on a waveform, add a fade in and fade out, and export as MP3 or WAV. Make ringtones for free; your audio is never uploaded.",
+    seoTitle: "Audio Cutter & MP3 Cutter Online Free",
+    metaDescription: "Free online audio cutter and MP3 cutter: trim songs on a waveform, remove a section, add fades and export MP3 or WAV. No sign-up, and nothing is uploaded.",
     accept: AUDIO,
     acceptLabel: AUDIO_LABEL,
     maxSizeMB: 200,
     multiple: false,
-    keywords: ["audio cutter", "mp3 cutter", "cut mp3 online", "trim audio", "cut audio online", "ringtone maker", "mp3 trimmer", "cut a song"],
-    steps: ["Drop an audio file.", "Drag the handles or type exact times, then preview.", "Export the selection as MP3 or WAV."],
-    features: ["Waveform with dual handles", "Keep or remove the selection", "Fade in and fade out", "MP3 or WAV export"],
+    keywords: ["audio cutter", "mp3 cutter", "mp3 cutter online free", "audio cutter online", "cut mp3 online", "cut audio online", "trim audio", "song cutter", "music cutter", "sound cutter", "mp3 clipper", "ringtone maker", "mp3 trimmer", "cut a song"],
+    steps: [
+      "Drop an MP3, WAV, M4A or other audio file up to 200 MB.",
+      "Drag the handles on the waveform or type exact start and end times, choose Keep or Remove selection, and play it to check.",
+      "Add a fade in or fade out if you like, then export the cut as MP3 (128–320 kbps) or WAV.",
+    ],
+    features: ["Waveform with draggable start and end handles", "Exact start and end times", "Keep the selection or remove it from the middle", "Fade in and fade out up to 10 seconds", "MP3 at 128–320 kbps or lossless WAV"],
     faqs: [
       { q: "How do I cut part of a song?", a: "Drop the file, drag the start and end handles around the part you want (or type exact times), preview it and export." },
+      { q: "How do I cut an MP3 online for free?", a: "Open the MP3 here, select the part to keep on the waveform and press Export. It is free, needs no sign-up and adds no watermark or jingle, and the file is cut in your browser rather than uploaded." },
+      { q: "Can I remove a part from the middle of a recording?", a: "Yes. Select the section you don't want and switch the mode to Remove selection. The parts before and after it are joined and exported as one file." },
       { q: "Can I make a ringtone?", a: "Yes. Select up to 30 seconds, add a short fade and export as MP3." },
       { q: "Which formats can I cut?", a: "MP3, WAV, OGG, FLAC, AAC, M4A and other formats your browser can play. The result is saved as MP3 or WAV." },
       { q: "Can I cut audio on my phone?", a: "Yes. Audio Cutter works in mobile browsers on Android and iPhone; drag the handles on the waveform with your finger." },
-      { q: "Does cutting reduce audio quality?", a: "Exporting as WAV adds no further compression. MP3 export is much smaller and sounds the same for most listening." },
+      { q: "Does cutting reduce audio quality?", a: "Exporting as WAV adds no further compression. MP3 export is much smaller; choose 256 or 320 kbps if you want to keep as much quality as possible." },
     ],
-    related: ["audio-joiner", "volume-booster", "reverse-audio"],
+    related: ["audio-joiner", "volume-booster", "audio-speed", "reverse-audio"],
   },
   {
     slug: "audio-joiner",
@@ -734,21 +740,27 @@ export const TOOLS: ToolConfig[] = [
     badges: [],
     description: "Change speed from 0.5x to 2x without changing pitch.",
     intro: "Speed up or slow down audio between 0.5x and 2.0x. Pitch lock keeps voices and instruments in their original key. Processing happens on your device, with no upload.",
-    seoTitle: "Change Audio Speed Online – Keep Pitch",
-    metaDescription: "Speed up or slow down audio from 0.5x to 2x with optional pitch lock, so voices don't sound like chipmunks. Free MP3 or WAV export, with no upload needed.",
+    seoTitle: "Audio Speed Changer – MP3 Speed Online",
+    metaDescription: "Free audio speed changer: speed up or slow down MP3, M4A, WAV and voice recordings from 0.5x to 2x, with pitch lock. Export MP3 or WAV, no upload needed.",
     accept: AUDIO,
     acceptLabel: AUDIO_LABEL,
     maxSizeMB: 200,
     multiple: false,
-    keywords: ["change audio speed", "speed up audio", "slow down audio", "slow down mp3", "speed up mp3", "change tempo without changing pitch", "audio speed changer"],
-    steps: ["Drop an audio file.", "Set the speed and choose whether to keep the pitch.", "Process and download."],
-    features: ["0.5x – 2.0x in 0.05 steps", "Pitch lock (time-stretch) in a Web Worker", "Instant preview of the setting", "MP3 or WAV export"],
+    keywords: ["audio speed changer", "mp3 speed changer", "mp3 speed editor", "change audio speed", "speed up audio", "slow down audio", "audio slower online", "slow down mp3", "speed up mp3", "voice speed changer", "change tempo without changing pitch"],
+    steps: [
+      "Drop an MP3, M4A, WAV or other audio file up to 200 MB.",
+      "Pick a preset from 0.5x to 2x or drag the slider in 0.05 steps, choose whether to keep the original pitch, and listen to the preview.",
+      "Apply the new speed and download the result as MP3 or WAV.",
+    ],
+    features: ["0.5x – 2.0x in 0.05 steps, with one-click presets", "Pitch lock (time-stretch) so voices sound natural", "Instant preview of the setting", "MP3 (128–320 kbps) or WAV export"],
     faqs: [
       { q: "How do I slow down a song without changing the pitch?", a: "Set the speed below 1.0x and keep pitch lock on. The tempo slows while the key stays the same." },
+      { q: "How do I speed up an MP3?", a: "Drop the MP3, choose a speed above 1x, such as 1.25x or 1.5x, check it in the preview and press Apply. The faster version downloads as MP3 or WAV." },
       { q: "Can I speed up a podcast or lecture?", a: "Yes. Speeds of 1.25x–1.5x with pitch lock keep speech clear while saving time." },
+      { q: "Can I change the speed of an M4A file or voice recording?", a: "Yes. M4A, AAC, OGG, FLAC, WAV and other formats your browser can play are accepted, including voice memos. The result is saved as MP3 or WAV, not M4A." },
       { q: "What is pitch lock?", a: "With pitch lock the tempo changes but the key stays the same. Without it, faster audio also sounds higher, like a tape machine." },
     ],
-    related: ["audio-cutter", "volume-booster", "reverse-audio"],
+    related: ["audio-cutter", "volume-booster", "audio-joiner", "reverse-audio"],
   },
   {
     slug: "volume-booster",
@@ -834,21 +846,29 @@ export const TOOLS: ToolConfig[] = [
     badges: [],
     description: "Create Code128, EAN-13, UPC and more as SVG or PNG.",
     intro: "Generate printable barcodes in Code128, EAN-13, EAN-8, UPC-A, Code39 and ITF-14 formats, and download them as SVG or PNG. Barcodes are drawn in your browser, with nothing sent to a server.",
-    seoTitle: "Barcode Generator – EAN-13, UPC, Code128",
-    metaDescription: "Generate printable barcodes in Code128, EAN-13, EAN-8, UPC-A, Code39 and ITF-14 with live validation, and download them as SVG or PNG. Free, no sign-up.",
+    seoTitle: "Barcode Generator – EAN, UPC, PNG & SVG",
+    metaDescription: "Free barcode generator and maker: create EAN-13, UPC-A, Code 128, Code 39 and ITF-14 barcodes with check digits added, and download as PNG or SVG. No sign-up.",
     accept: [],
     acceptLabel: "",
     maxSizeMB: 0,
     multiple: false,
-    keywords: ["barcode generator", "free barcode generator", "ean 13 barcode generator", "upc barcode generator", "code 128 barcode", "barcode maker", "create barcode online", "barcode svg"],
-    steps: ["Choose a barcode format.", "Enter the value and adjust size and colours.", "Download as SVG or PNG."],
-    features: ["Code128, EAN-13, EAN-8, UPC-A, Code39, ITF-14", "Live validation of the value", "Bar width, height and text options", "SVG (vector) and PNG download"],
+    keywords: ["barcode generator", "free barcode generator", "barcode maker", "barcode maker png", "barcode generator svg", "ean 13 barcode generator", "ean generator", "upc barcode generator", "12 digit upc barcode generator", "code 128 generator", "printable ean barcode", "create barcode online"],
+    steps: [
+      "Choose a format: Code 128, EAN-13, EAN-8, UPC-A, Code 39 or ITF-14.",
+      "Enter the value. For EAN and UPC, leave off the last digit and the check digit is calculated for you. Adjust bar width, height, text and colours.",
+      "Download the barcode as SVG for print artwork or as a high-resolution PNG.",
+    ],
+    features: ["Code 128, EAN-13, EAN-8, UPC-A, Code 39, ITF-14", "Live validation and automatic check digits", "Bar width, height, text size and colours", "SVG (vector) and 3× resolution PNG download"],
     faqs: [
       { q: "Which barcode type should I use?", a: "EAN-13 (or UPC-A in North America) for retail products, Code128 for shipping labels and inventory, and ITF-14 for outer cartons." },
+      { q: "Can I download a barcode as PNG?", a: "Yes. Press PNG and the barcode is saved at three times the preview size, so it stays crisp in documents and on labels. Press SVG for a vector file that scales to any size." },
+      { q: "How do I make a printable EAN-13 barcode for packaging?", a: "Choose EAN-13, enter the 12 digits of your product number and the check digit is added. Download the SVG for your packaging artwork, and keep the default black bars on white for reliable scanning." },
+      { q: "How do I make a 12-digit UPC barcode?", a: "Choose UPC-A and enter the first 11 digits; the 12th, the check digit, is calculated for you. If you enter all 12, the last one must be a valid check digit." },
+      { q: "Can this tool generate an EAN number for my product?", a: "No. It draws the barcode for a number you already have. Product numbers for retail EAN and UPC barcodes are issued by GS1, so that the number is unique to your company." },
       { q: "Can I print the barcodes?", a: "Yes. Download SVG for sharp printing at any size, or PNG for documents and labels." },
       { q: "Why is my EAN-13 value rejected?", a: "EAN-13 needs 12 or 13 digits. If you enter 13 digits, the last one must be a valid check digit." },
     ],
-    related: ["qr-code", "color-picker", "case-converter"],
+    related: ["qr-code", "color-picker", "word-counter", "case-converter"],
   },
   {
     slug: "word-counter",
@@ -939,9 +959,11 @@ interface ConversionSpec {
   extraKeywords: string[];
   features: string[];
   faqs: ToolFaq[];
+  /** Replaces the default related tools for this page. */
+  related?: string[];
 }
 
-const MIME = { JPG: "image/jpeg", PNG: "image/png", WebP: "image/webp" } as const;
+const MIME ={ JPG: "image/jpeg", PNG: "image/png", WebP: "image/webp" } as const;
 
 function conversion(spec: ConversionSpec): ToolConfig {
   const slug = `${spec.from}-to-${spec.to}`.toLowerCase();
@@ -964,7 +986,7 @@ function conversion(spec: ConversionSpec): ToolConfig {
     steps: [`Add one or more ${spec.from} images.`, `${spec.to} is already selected; adjust the options if you like.`, `Convert and download each ${spec.to} or all of them as a ZIP.`],
     features: spec.features,
     faqs: spec.faqs,
-    related: ["image-converter", "compress-image", "resize-image"],
+    related: spec.related ?? ["image-converter", "compress-image", "resize-image"],
     variantOf: "image-converter",
     convertTo: MIME[spec.to],
     formats: [spec.from, spec.to],
@@ -977,14 +999,18 @@ export const CONVERSIONS: ToolConfig[] = [
     to: "JPG",
     description: "Convert iPhone HEIC photos to JPG.",
     intro: "iPhones save photos as HEIC, which Windows, many websites and upload forms can't open. Convert HEIC to JPG in bulk so your photos work everywhere. The photos are decoded and converted on your device, never uploaded.",
-    metaDescription: "Convert HEIC to JPG online for free. Turn iPhone photos into JPG files that open on Windows, Android and any website. Batch convert, with no upload.",
-    extraKeywords: ["heic to jpeg", "iphone photo to jpg", "open heic file on windows", "convert heic"],
-    features: ["Reads iPhone HEIC and HEIF photos", "Batch conversion with ZIP download", "Quality slider", "Runs in your browser"],
+    metaDescription: "Free HEIC to JPG converter: change iPhone photos to high-quality JPG that opens on Windows, Android and any website. Batch convert, no sign-up, no upload.",
+    extraKeywords: ["heic to jpg free", "free heic to jpg converter", "convert heic to jpg free", "change heic to jpg", "heic to jpg high quality", "heic to jpeg", "iphone photo to jpg", "open heic file on windows", "convert heic"],
+    features: ["Reads iPhone HEIC and HEIF photos", "Batch conversion with ZIP download", "Quality slider from 10% to 100%, 90% by default", "Can also save as PNG, WebP or BMP", "Runs in your browser"],
     faqs: [
+      { q: "How do I convert HEIC to JPG for free?", a: "Add your HEIC photos, keep JPG selected and press Convert. Download each JPG or all of them as a ZIP. It is free, with no sign-up and no watermark." },
+      { q: "Does converting HEIC to JPG lose quality?", a: "JPG is saved at 90% quality by default, which looks the same as the original for normal viewing. Raise the quality slider to 100% for the highest-quality JPG; the file gets larger than the HEIC either way." },
+      { q: "Can I convert many HEIC photos at once?", a: "Yes. Add several photos in one go. Each takes a few seconds to decode, and the JPGs can be downloaded together as a ZIP." },
       { q: "What is a HEIC file?", a: "HEIC is the format iPhones and iPads use for photos since iOS 11. It makes photos about half the size of JPG, but Windows, Android apps and many websites can't open it." },
       { q: "Are my iPhone photos uploaded to convert them?", a: "No. The HEIC decoder runs inside your browser, so your photos never leave your device. It downloads once, about 3 MB, the first time you convert a HEIC photo." },
       { q: "How do I stop my iPhone saving HEIC?", a: "In the iPhone Settings app, open Camera › Formats and choose Most Compatible. New photos are then saved as JPG." },
     ],
+    related: ["image-converter", "compress-image", "images-to-pdf", "resize-image"],
   }),
   conversion({
     from: "PNG",
@@ -1112,6 +1138,8 @@ interface SizeSpec {
   metaDescription: string;
   extraKeywords: string[];
   faqs: ToolFaq[];
+  /** Replaces the default <title> when it would exceed 40 characters. */
+  seoTitle?: string;
 }
 
 function sizePage(spec: SizeSpec): ToolConfig {
@@ -1124,7 +1152,7 @@ function sizePage(spec: SizeSpec): ToolConfig {
     badges: ["Batch"],
     description: spec.description,
     intro: spec.intro,
-    seoTitle: `Compress Image to ${spec.label} – Free, No Upload`,
+    seoTitle: spec.seoTitle ?? `Compress Image to ${spec.label} – Free, No Upload`,
     metaDescription: spec.metaDescription,
     accept: [...IMAGES, ...HEIC],
     acceptLabel: `${IMAGE_LABEL}, HEIC`,
@@ -1181,6 +1209,7 @@ export const SIZE_PAGES: ToolConfig[] = [
   sizePage({
     kb: 100,
     label: "100 KB",
+    seoTitle: "Compress Image to 100KB – Free, No Upload",
     description: "Compress photos to under 100 KB for forms and job portals.",
     intro: "100 KB is one of the most common upload limits on job portals, visa and ID applications and online forms. Compress your image to 100 KB in one step, with a before-and-after preview. Images are processed on your device, never uploaded.",
     metaDescription: "Compress an image to 100 KB online for free. Meet job portal, visa and form upload limits with a preset target size. No sign-up, and no upload to a server.",
@@ -1194,6 +1223,7 @@ export const SIZE_PAGES: ToolConfig[] = [
   sizePage({
     kb: 200,
     label: "200 KB",
+    seoTitle: "Compress Image to 200KB – Free, No Upload",
     description: "Reduce images to under 200 KB for profiles and listings.",
     intro: "Compress images to 200 KB for profile pictures, marketplace listings, documents and forms with a 200 KB limit. The target size is preset and the before-and-after slider shows the result. Images never leave your device.",
     metaDescription: "Compress images to 200 KB online for free: profile photos, listings and forms with a 200 KB limit. Preset target size, batch support and no upload.",
@@ -1207,6 +1237,7 @@ export const SIZE_PAGES: ToolConfig[] = [
   sizePage({
     kb: 500,
     label: "500 KB",
+    seoTitle: "Compress Image to 500KB – Free, No Upload",
     description: "Compress photos to under 500 KB for websites and email.",
     intro: "500 KB keeps photos sharp while making them light enough for websites, blogs, online stores and email. Compress images to 500 KB with a preset target and compare the result before downloading. Nothing is uploaded.",
     metaDescription: "Compress images to 500 KB online for free. Keep photos sharp but light for websites, blogs and email. Preset target size, batch support and no upload.",
@@ -1232,8 +1263,12 @@ export const SIZE_PAGES: ToolConfig[] = [
   }),
 ];
 
-function pdfSizePage(kb: number, label: string, use: string, faqs: ToolFaq[]): ToolConfig {
-  return {
+/** Per-page copy that replaces the shared template; `keywords` are added to the template's. */
+type PdfSizeOverrides = Partial<Pick<ToolConfig, "seoTitle" | "metaDescription" | "keywords" | "steps" | "features" | "related">>;
+
+function pdfSizePage(kb: number, label: string, use: string, faqs: ToolFaq[], overrides: PdfSizeOverrides = {}): ToolConfig {
+  const { keywords = [], ...rest } = overrides;
+  const base: ToolConfig = {
     slug: `compress-pdf-to-${label.toLowerCase().replace(" ", "")}`,
     title: `Compress PDF to ${label}`,
     category: "document",
@@ -1255,6 +1290,7 @@ function pdfSizePage(kb: number, label: string, use: string, faqs: ToolFaq[]): T
     variantOf: "file-compressor",
     targetKb: kb,
   };
+  return { ...base, ...rest, keywords: [...base.keywords, ...keywords] };
 }
 
 export const PDF_SIZE_PAGES: ToolConfig[] = [
@@ -1266,10 +1302,27 @@ export const PDF_SIZE_PAGES: ToolConfig[] = [
     { q: "How do I reduce a PDF to 200 KB?", a: "Add the PDF and press Compress; the 200 KB target is preset. Several pages of a scanned document usually fit at a clearly readable quality." },
     { q: "Will the text still be readable?", a: "Yes. The tool starts at high quality and only lowers it as far as needed. Pages become images, so text can't be selected afterwards." },
   ]),
-  pdfSizePage(500, "500 KB", "email and government portals", [
-    { q: "How do I make a PDF smaller than 500 KB?", a: "Add it and press Compress; 500 KB is already selected. Most scanned documents of a few pages fit with little visible change." },
-    { q: "Why not just zip the PDF?", a: "Zipping barely shrinks a PDF, and many portals don't accept ZIP files. Compressing the PDF itself keeps it a normal PDF that opens anywhere." },
-  ]),
+  pdfSizePage(
+    500,
+    "500 KB",
+    "email and government portals",
+    [
+      { q: "How do I make a PDF smaller than 500 KB?", a: "Add it and press Compress; 500 KB is already selected. Most scanned documents of a few pages fit with little visible change." },
+      { q: "How do I reduce a PDF file size under 500 KB if it is 5 MB or more?", a: "Add it as it is. The compressor lowers the page resolution step by step until the PDF fits under 500 KB, and shows the size before and after. Each PDF can be up to 200 MB." },
+      { q: "What if my PDF won't go under 500 KB?", a: "You get the smallest readable version and a note that it missed the target. Remove pages you don't need with Split PDF and compress again, or pick a larger target if the portal allows it." },
+      { q: "Can I compress several PDFs to 500 KB at once?", a: "Yes. Add all of them and each one is compressed to fit under 500 KB. Download them one by one or together as a ZIP. Files already under 500 KB are kept unchanged." },
+      { q: "Is the result still a normal PDF?", a: "Yes. It opens in any PDF reader and upload form. To reach the size, pages are saved as images, so their text can't be selected or searched afterwards; keep your original if you need that." },
+      { q: "Why not just zip the PDF?", a: "Zipping barely shrinks a PDF, and many portals don't accept ZIP files. Compressing the PDF itself keeps it a normal PDF that opens anywhere." },
+    ],
+    {
+      seoTitle: "Compress PDF to 500KB – Free, No Upload",
+      metaDescription: "Compress PDF to 500 KB online for free. This PDF compressor gets scans and documents under 500 KB for email and portals, several at once, with no upload.",
+      keywords: ["pdf compressor 500 kb", "500 kb pdf", "pdf 500kb", "reduce pdf file size under 500kb", "500kb pdf converter", "compress pdf 500kb"],
+      steps: ["Add one or more PDFs, up to 200 MB each.", "The target is already set to 500 KB; pick another preset or type any size in KB if you need to.", "Compress, check the new size, and download each PDF under 500 KB or all of them as a ZIP."],
+      features: ["Target preset to 500 KB, or any size in KB", "Starts at the best quality that fits", "Several PDFs at once, with ZIP download", "Files already under 500 KB are kept unchanged"],
+      related: ["compress-pdf", "compress-pdf-to-1mb", "compress-pdf-to-200kb", "split-pdf", "file-compressor", "merge-pdf"],
+    },
+  ),
   pdfSizePage(1024, "1 MB", "email attachments and uploads", [
     { q: "How do I compress a PDF to under 1 MB?", a: "Add it and press Compress; the 1 MB target is preset. Large scans and photo-heavy PDFs usually fit with almost no visible difference." },
     { q: "My PDF is already under 1 MB. What happens?", a: "Files already under the target are returned unchanged, so you never get a worse copy of a file that already fits." },
@@ -1335,7 +1388,7 @@ export const SITE = {
   url:
     process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL ? "https://tools.devcipator.com" : "http://localhost:3000"),
   /** Sitemap lastModified dates. Bump `content` when tool or category copy changes, `legal` when privacy or terms change. */
-  updated: { content: "2026-11-19", legal: "2026-10-24" },
+  updated: { content: "2026-11-28", legal: "2026-10-24" },
 };
 
 /** <title> and description for the fixed pages. Titles of pages other than home get the layout's “| Devcipator Tools” suffix. */

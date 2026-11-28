@@ -52,6 +52,14 @@ export const TOOL_DETAILS: Record<string, ToolDetails> = {
     ],
   },
   // ───────────────────────────── PDF ─────────────────────────────
+  "compress-pdf-to-500kb": {
+    heading: "Get a PDF under 500 KB for email and portals",
+    paragraphs: [
+      "Government, university and job portals often cap PDF uploads at 500 KB, while a few scanned pages from a phone or office scanner easily reach several MB. This PDF compressor has the 500 KB target already selected: add the file, press Compress and you get a PDF under 500 KB, with the size before and after shown. You can also pick another preset or type any size in KB.",
+      "Each PDF is compressed only as much as it needs. It starts at a sharp 150 DPI and the resolution is lowered step by step until the file fits, so the result stays as readable as possible. Pages are saved as images, which is what makes such a large reduction possible, so text can't be selected afterwards. Files already under 500 KB are returned unchanged, and the target is counted so the result fits however the portal measures a kilobyte.",
+      "If a long document can't reach 500 KB, remove the pages you don't need with [Split PDF](/tools/split-pdf) first. For a quick reduction without a fixed target, use [Compress PDF](/tools/compress-pdf); for stricter limits, try [Compress PDF to 200 KB](/tools/compress-pdf-to-200kb). Photos and scans saved as images can be shrunk with [Compress Image](/tools/compress-image).",
+    ],
+  },
   "merge-pdf": {
     heading: "When to combine PDF files",
     paragraphs: [
@@ -141,6 +149,14 @@ export const TOOL_DETAILS: Record<string, ToolDetails> = {
       "For the clearest result at small sizes, crop the photo to the shape the form wants with [Crop Image](/tools/crop-image) first, and save as JPG, which is accepted everywhere. To compress PDFs and photos together, use the [File Compressor](/tools/file-compressor). Read [how to compress an image to 100 KB](/guides/how-to-compress-image-to-100kb) for a step-by-step guide.",
     ],
   },
+  "heic-to-jpg": {
+    heading: "Change iPhone HEIC photos to JPG",
+    paragraphs: [
+      "iPhones save photos as HEIC by default. They look great on Apple devices, but Windows, many Android apps, online shops and upload forms can't open them. This free HEIC to JPG converter turns them into ordinary JPG files: add one photo or a whole batch, keep JPG selected and press Convert, then download each JPG or all of them as a ZIP.",
+      "JPGs are saved at 90% quality by default, which keeps photos looking the same at normal viewing size. Move the quality slider up to 100% for the highest-quality JPG, or down for smaller files. The same page can also change HEIC to PNG, WebP or BMP.",
+      "The HEIC decoder runs in your browser, so your photos are converted on your device instead of being uploaded. To turn the JPGs into one document, use [Images to PDF](/tools/images-to-pdf); to get them under an upload limit, [Compress Image](/tools/compress-image) also accepts HEIC photos directly.",
+    ],
+  },
   "resize-image": {
     heading: "Resize images to exact sizes",
     paragraphs: [
@@ -191,11 +207,11 @@ export const TOOL_DETAILS: Record<string, ToolDetails> = {
   },
   // ───────────────────────────── Audio ─────────────────────────────
   "audio-cutter": {
-    heading: "Trim songs, recordings and ringtones",
+    heading: "Cut songs, recordings and ringtones online",
     paragraphs: [
-      "Audio Cutter trims any song or recording on a visual waveform: drag the start and end handles to keep the part you want, or remove a section from the middle. It works as an MP3 cutter and also handles WAV, OGG, M4A and other formats your browser can play.",
-      "Common uses include cutting the silence from the start of a voice memo, pulling a clip from an interview or lecture, and making a ringtone from a favourite part of a song. Add a fade in and fade out for smooth edges, preview the selection, then export as MP3 or WAV. MP3 ringtones work on most Android phones; iPhone ringtones need Apple's own format.",
-      "To combine several clips afterwards, use [Audio Joiner](/tools/audio-joiner). If the clip is too quiet, [Volume Booster](/tools/volume-booster) makes it louder.",
+      "This online audio cutter trims any song or recording on a visual waveform: drag the start and end handles to keep the part you want, or switch to Remove selection to cut a section out of the middle. It works as a free MP3 cutter and also handles WAV, OGG, FLAC, AAC, M4A and other formats your browser can play, up to 200 MB per file.",
+      "Use it as a song cutter or music cutter to make a ringtone from a favourite part of a track, as a sound cutter for clips and effects, or to cut the silence from the start of a voice memo and pull a quote from an interview or lecture. Type exact start and end times when a cut must be precise, add a fade in and fade out of up to 10 seconds for smooth edges, and play the selection before you export. MP3 ringtones work on most Android phones; iPhone ringtones need Apple's own format.",
+      "Choose MP3 at 128 to 320 kbps for a small file, or WAV for a lossless copy. To combine several clips afterwards, use [Audio Joiner](/tools/audio-joiner). If the clip is too quiet, [Volume Booster](/tools/volume-booster) makes it louder, and [Audio Speed Changer](/tools/audio-speed) speeds it up or slows it down.",
     ],
   },
   "audio-joiner": {
@@ -209,9 +225,9 @@ export const TOOL_DETAILS: Record<string, ToolDetails> = {
   "audio-speed": {
     heading: "Change tempo without changing pitch",
     paragraphs: [
-      "Audio Speed Changer speeds up or slows down audio anywhere from 0.5x to 2x in small steps. Slow down a song to learn a guitar part or dance routine, or speed up a podcast, lecture or audiobook to get through it faster.",
-      "With pitch lock on, the tempo changes without changing the pitch, so voices don't sound like chipmunks when sped up or turn deep when slowed down. Turn it off for the classic tape-speed effect. Preview the setting before exporting the result as MP3 or WAV.",
-      "To keep only part of a track, trim it with [Audio Cutter](/tools/audio-cutter) first.",
+      "Audio Speed Changer speeds up or slows down audio anywhere from 0.5x to 2x in 0.05 steps, with presets for 0.5x, 0.75x, 1.25x, 1.5x and 2x. Use it as an MP3 speed changer to slow down a song while you learn a guitar part or dance routine, or speed up a podcast, lecture, audiobook or voice message to get through it faster.",
+      "With pitch lock on, the tempo changes without changing the pitch, so voices don't sound like chipmunks when sped up or turn deep when slowed down. Turn it off for the classic tape-speed effect. Preview the setting before exporting the result as MP3 or WAV. It reads MP3, M4A, WAV, OGG, FLAC and other formats your browser can play.",
+      "To keep only part of a track, trim it with [Audio Cutter](/tools/audio-cutter) first, and if a sped-up recording is too quiet, make it louder with [Volume Booster](/tools/volume-booster).",
     ],
   },
   "volume-booster": {
@@ -242,8 +258,8 @@ export const TOOL_DETAILS: Record<string, ToolDetails> = {
     heading: "Create barcodes for products and labels",
     paragraphs: [
       "Barcode Generator creates printable barcodes in the most common formats: EAN-13 and UPC-A for retail products, EAN-8 for small packages, Code 128 and Code 39 for labels and inventory, and ITF-14 for shipping cartons. The value is checked as you type, including EAN and UPC check digits, so you don't print a barcode that won't scan.",
-      "Adjust bar width, height and the text under the code, then download it as SVG for crisp printing at any size or as PNG for documents. Code 128 is a good default for internal labels because it encodes letters and numbers compactly.",
-      "Retail EAN and UPC numbers have to be issued to your company by GS1; this tool draws the barcode for a number you already have. For links and contact details, use the [QR Code Generator](/tools/qr-code).",
+      "Adjust bar width, height, the text under the code and the bar and background colours, then download it as SVG for crisp printing at any size, or as a PNG barcode saved at three times the preview resolution for documents and label software. Code 128 is a good default for internal labels because it encodes letters and numbers compactly.",
+      "For printable EAN barcodes on packaging, enter the 12-digit product number and let the generator add the check digit, then place the SVG in your artwork. Retail EAN and UPC numbers have to be issued to your company by GS1; this tool draws the barcode for a number you already have. For links and contact details, use the [QR Code Generator](/tools/qr-code), and read [whether QR codes expire](/guides/do-qr-codes-expire) before printing one.",
     ],
   },
   "word-counter": {
