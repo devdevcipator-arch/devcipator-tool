@@ -31,6 +31,12 @@ UV="$HOME/.local/bin/uv"
 CLAUDE_BIN="${CLAUDE_BIN:-$(command -v claude || echo "$HOME/.npm-global/bin/claude")}"
 # launchd runs with a minimal PATH; make node/npm/claude/uv resolvable.
 export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
+# Long-lived token from `claude setup-token` for unattended runs (the normal claude.ai
+# login expires). Shared with the main site's runner; kept outside the repo, mode 600.
+CLAUDE_TOKEN_FILE="$HOME/.config/devcipator-seo/claude-oauth-token"
+if [[ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" && -s "$CLAUDE_TOKEN_FILE" ]]; then
+  export CLAUDE_CODE_OAUTH_TOKEN="$(tr -d '[:space:]' < "$CLAUDE_TOKEN_FILE")"
+fi
 # Changes Claude may make. Everything else (tool components, workers, hooks, lib) is off limits,
 # so the client-side tools themselves can't break.
 ALLOWED_PATHS_RE='^(src/config/|src/app/|src/lib/seo\.ts$)'
