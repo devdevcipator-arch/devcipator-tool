@@ -188,6 +188,12 @@ Where the content lives (edit data, not components):
   FAQ and all JSON-LD. Do not restructure it.
 
 Goal: grow qualified search traffic using the real queries in gsc-summary.md.
+0. PAGE LIMIT: change at most $MAX_PAGES pages in total this run. Every page whose rendered
+   output changes counts: pages you optimise below, audit fixes (titles, descriptions, H1s)
+   and every page affected by a shared template or helper change. A related-tools or text
+   link counts against the page it is added to, not the page it points to. If more pages
+   need work, do the highest-impact ones and list the rest under recommendations; later
+   runs will pick them up.
 1. Pick at most $MAX_PAGES tool or guide pages, highest opportunity first: non-brand queries
    at positions 4-20 with the most impressions; then high-impression queries with low CTR
    (title/description not earning the click); then queries beyond position 20 that the page
@@ -211,7 +217,8 @@ $RECENT
       a [text](/tools/slug) link in TOOL_DETAILS or a guide paragraph. Only link to slugs that
       exist in TOOL_PAGES or GUIDES.
 3. You may also fix real issues from the audit (e.g. a rendered title over 60 characters) on
-   the pages you touch, or site-wide in up to 3 small extra edits.
+   the pages you are already changing. Fixing any other page uses up one of the $MAX_PAGES
+   slots, so only do it while slots remain.
 4. If you changed any tool or category copy, set SITE.updated.content in tools.config.ts to
    $DATE (it drives the sitemap lastmod); for a guide, set its updated date instead.
 
@@ -228,7 +235,8 @@ Hard rules:
   15-60 rendered characters, description outside 70-160, not exactly one H1, invalid JSON-LD,
   missing FAQ schema, duplicate title/description, broken internal link) discards the run.
 - Write the slugs you changed to $RUN_DIR/changed-pages.txt, one per line, prefixed with
-  "tools/" or "guides/" (e.g. tools/audio-cutter).
+  "tools/" or "guides/" (e.g. tools/audio-cutter). List every page that counts toward the
+  limit, including audit fixes and pages affected by shared changes; at most $MAX_PAGES lines.
 
 Finish with a short markdown summary: for each page, the target queries (with position and
 impressions) and what changed (old -> new title/description, FAQs added, links added); other
