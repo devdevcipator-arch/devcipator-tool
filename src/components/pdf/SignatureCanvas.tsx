@@ -215,7 +215,16 @@ export function SignatureCanvas({ onChange }: { onChange: (canvas: HTMLCanvasEle
           </Button>
         </div>
       </div>
-      <Field label="Colour code" htmlFor={hexId} hint={hexValid ? undefined : "Enter a hex code such as #1D4ED8 or #15F."}>
+      {/* The hint line is always there, so the controls below don't jump when the code becomes valid or invalid. */}
+      <Field
+        label="Colour code"
+        htmlFor={hexId}
+        hint={
+          <span id={`${hexId}-hint`} className={cn(!hexValid && "text-danger")}>
+            {hexValid ? "Type a hex code, or pick a colour above." : "Enter a hex code such as #1D4ED8 or #15F."}
+          </span>
+        }
+      >
         <div className="flex items-center gap-2">
           <span className="size-9 shrink-0 rounded-lg border border-border pointer-coarse:size-11" style={{ background: color }} aria-hidden />
           <TextInput
@@ -228,7 +237,9 @@ export function SignatureCanvas({ onChange }: { onChange: (canvas: HTMLCanvasEle
             spellCheck={false}
             autoComplete="off"
             aria-invalid={!hexValid}
-            className={cn("font-mono uppercase", !hexValid && "border-danger focus:border-danger")}
+            aria-describedby={`${hexId}-hint`}
+            // aria-invalid variants out-rank the base hover/focus border colours (cn doesn't merge conflicting classes).
+            className="font-mono uppercase aria-invalid:border-danger aria-invalid:hover:border-danger aria-invalid:focus:border-danger"
           />
         </div>
       </Field>
