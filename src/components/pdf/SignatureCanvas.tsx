@@ -1,12 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type SignaturePad from "signature_pad";
 import { Eraser, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Field, Slider, TextInput } from "@/components/ui/controls";
 import { cn } from "@/lib/cn";
 
-const PEN_COLORS = ["#111827", "#1d4ed8", "#b91c1c"];
+const PEN_COLORS = ["#111827", "#1d4ed8", "#b91c1c", "#15803d", "#6d28d9"];
+/** Thickest part of a stroke, in CSS pixels. The thinnest part keeps the original 0.8 : 2.6 ratio. */
+const DEFAULT_WIDTH = 2.6;
+const MIN_WIDTH_RATIO = 0.8 / 2.6;
+
+/** Accepts "1d4ed8", "#1D4ED8" or "#15f" and returns "#rrggbb", or null when it isn't a hex colour. */
+function normalizeHex(value: string): string | null {
+  const hex = value.trim().replace(/^#/, "").toLowerCase();
+  if (/^[0-9a-f]{6}$/.test(hex)) return `#${hex}`;
+  if (/^[0-9a-f]{3}$/.test(hex)) return `#${[...hex].map((c) => c + c).join("")}`;
+  return null;
+}
 
 /** Returns a copy of the canvas cropped to its non-transparent pixels (plus padding). */
 export function trimCanvas(source: HTMLCanvasElement, padding = 6): HTMLCanvasElement | null {
@@ -44,8 +56,13 @@ export function SignatureCanvas({ onChange }: { onChange: (canvas: HTMLCanvasEle
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const padRef = useRef<SignaturePad | null>(null);
   const onChangeRef = useRef(onChange);
+  const hexId = useId();
   const [color, setColor] = useState(PEN_COLORS[0]);
+  const [hexDraft, setHexDraft] = useState(PEN_COLORS[0]);
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [empty, setEmpty] = useState(true);
+  const isCustom = !PEN_COLORS.includes(color);
+  const hexValid = normalizeHex(hexDraft) !== null;
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -80,7 +97,7 @@ export function SignatureCanvas({ onChange }: { onChange: (canvas: HTMLCanvasEle
     import("signature_pad").then(({ default: SignaturePadCtor }) => {
       if (disposed) return;
       resize();
-      pad = new SignaturePadCtor(canvas, { penColor: PEN_COLORS[0], minWidth: 0.8, maxWidth: 2.6 });
+      pad = new SignaturePadCtor(canvas, { penColor: PEN_COLORS[0], minWidth: DEFAULT_WIDTH * MIN_WIDTH_RATIO, maxWidth: DEFAULT_WIDTH });
       pad.addEventListener("endStroke", emit);
       padRef.current = pad;
     });
@@ -95,14 +112,37 @@ export function SignatureCanvas({ onChange }: { onChange: (canvas: HTMLCanvasEle
     };
   }, []);
 
-  function pickColor(c: string) {
-    setColor(c);
+  /** Sets the pen for new strokes and redraws existing strokes with it. */
+  function restyle(c: string, w: number) {
     const pad = padRef.current;
     if (!pad) return;
+    const minWidth = w * MIN_WIDTH_RATIO;
     pad.penColor = c;
-    // Recolour existing strokes too.
-    pad.fromData(pad.toData().map((g) => ({ ...g, penColor: c })));
+    pad.minWidth = minWidth;
+    pad.maxWidth = w;
+    // dotSize 0 lets single-tap dots follow the new width.
+    pad.fromData(pad.toData().map((g) => ({ ...g, penColor: c, minWidth, maxWidth: w, dotSize: 0 })));
     onChangeRef.current(pad.isEmpty() ? null : trimCanvas(canvasRef.current!));
+  }
+
+  function pickColor(c: string) {
+    setColor(c);
+    setHexDraft(c);
+    restyle(c, width);
+  }
+
+  function changeWidth(w: number) {
+    setWidth(w);
+    restyle(color, w);
+  }
+
+  function onHexChange(value: string) {
+    setHexDraft(value);
+    const hex = normalizeHex(value);
+    if (hex && hex !== color) {
+      setColor(hex);
+      restyle(hex, width);
+    }
   }
 
   function undo() {
@@ -128,9 +168,9 @@ export function SignatureCanvas({ onChange }: { onChange: (canvas: HTMLCanvasEle
         <div className="pointer-events-none absolute inset-x-6 bottom-8 border-b border-dashed border-neutral-300" />
         {empty && <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-neutral-400">Sign here</p>}
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-y-1">
         {/* The swatch stays small; the button around it is the touch target. */}
-        <div className="flex gap-1.5 pointer-coarse:gap-0" role="radiogroup" aria-label="Pen colour">
+        <div className="flex flex-wrap gap-1.5 pointer-coarse:gap-0" role="radiogroup" aria-label="Pen colour">
           {PEN_COLORS.map((c) => (
             <button
               key={c}
@@ -147,6 +187,24 @@ export function SignatureCanvas({ onChange }: { onChange: (canvas: HTMLCanvasEle
               />
             </button>
           ))}
+          {/* Any colour: the native picker sits invisibly over a rainbow swatch. */}
+          <span className="relative flex size-6 items-center justify-center rounded-full pointer-coarse:size-11">
+            <span
+              className={cn("size-6 rounded-full ring-offset-2 ring-offset-surface", isCustom && "ring-2 ring-primary")}
+              style={{ background: isCustom ? color : "conic-gradient(#ef4444, #f59e0b, #22c55e, #06b6d4, #3b82f6, #a855f7, #ef4444)" }}
+              aria-hidden
+            />
+            <input
+              type="color"
+              role="radio"
+              aria-checked={isCustom}
+              aria-label="Choose any pen colour"
+              title="Choose any colour"
+              value={color}
+              onChange={(e) => pickColor(e.target.value)}
+              className="absolute inset-0 size-full cursor-pointer rounded-full opacity-0"
+            />
+          </span>
         </div>
         <div className="flex gap-1">
           <Button size="sm" variant="ghost" icon={<Undo2 className="size-4" />} onClick={undo} disabled={empty}>
@@ -157,6 +215,32 @@ export function SignatureCanvas({ onChange }: { onChange: (canvas: HTMLCanvasEle
           </Button>
         </div>
       </div>
+      <Field label="Colour code" htmlFor={hexId} hint={hexValid ? undefined : "Enter a hex code such as #1D4ED8 or #15F."}>
+        <div className="flex items-center gap-2">
+          <span className="size-9 shrink-0 rounded-lg border border-border pointer-coarse:size-11" style={{ background: color }} aria-hidden />
+          <TextInput
+            id={hexId}
+            value={hexDraft}
+            onChange={(e) => onHexChange(e.target.value)}
+            onBlur={() => setHexDraft(color)}
+            placeholder="#1D4ED8"
+            maxLength={7}
+            spellCheck={false}
+            autoComplete="off"
+            aria-invalid={!hexValid}
+            className={cn("font-mono uppercase", !hexValid && "border-danger focus:border-danger")}
+          />
+        </div>
+      </Field>
+      <Slider
+        label="Line thickness"
+        value={width}
+        onChange={changeWidth}
+        min={0.6}
+        max={6}
+        step={0.2}
+        format={(v) => (v <= 1.4 ? "Thin" : v <= 3.4 ? "Normal" : "Bold") + ` · ${v.toFixed(1)}`}
+      />
     </div>
   );
 }
